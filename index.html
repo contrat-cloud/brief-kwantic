@@ -1,1572 +1,296 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Croissance prédictive pour Kwantic — Egery Group</title>
-<meta name="theme-color" content="#6936EC">
-<link rel="icon" href="https://kwantic.fr/logos/logo-kwantic-dark.svg" type="image/svg+xml">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<meta name="theme-color" content="#0d0f1a">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-:root {
-  --purple: #6936EC;
-  --purple-light: #8B5CF6;
-  --purple-dark: #5B21B6;
-  --purple-bg: #F5F3FF;
-  --purple-bg2: #EDE9FE;
-  --dark: #1A1A2E;
-  --dark-surface: #16213E;
-  --teal: #0D9488;
-  --teal-light: #14B8A6;
-  --teal-bg: #F0FDFA;
-  --orange: #F97316;
-  --orange-bg: #FFF7ED;
-  --green: #10B981;
-  --green-bg: #ECFDF5;
-  --red-bg: #FFF1F2;
-  --gray-50: #F9FAFB;
-  --gray-100: #F3F4F6;
-  --gray-200: #E5E7EB;
-  --gray-300: #D1D5DB;
-  --gray-400: #9CA3AF;
-  --gray-500: #6B7280;
-  --gray-600: #4B5563;
-  --gray-700: #374151;
-  --gray-800: #1F2937;
-  --gray-900: #111827;
-  --radius: 16px;
-  --radius-sm: 10px;
-  --radius-xs: 6px;
+:root{
+  --purple:#6936EC; --purple-l:#8B5CF6; --teal:#0D9488; --teal-l:#2dd4bf;
+  --orange:#F97316; --green:#10B981; --red:#ff5864;
+  --bg:#0b0d17; --bg2:#11142100; --surf:#161a2b; --surf2:#1d2236;
+  --line:rgba(255,255,255,.09); --line2:rgba(255,255,255,.14);
+  --txt:#ECEAF6; --txt2:#A9AAC4; --txt3:#6f7193;
+  --r:16px;
 }
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--txt);font-family:"Inter",-apple-system,BlinkMacSystemFont,sans-serif;font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+.eg{font-family:Georgia,"Times New Roman",serif;font-weight:400;letter-spacing:.4px}
+h1,h2,h3{letter-spacing:-.02em;line-height:1.1}
+.grad{background:linear-gradient(100deg,var(--purple-l),var(--teal-l));-webkit-background-clip:text;background-clip:text;color:transparent}
+.muted{color:var(--txt2)} .dim{color:var(--txt3)}
+.tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--purple-l);background:rgba(105,54,236,.13);border:1px solid rgba(105,54,236,.3);padding:5px 12px;border-radius:8px;margin-bottom:16px}
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: var(--gray-50);
-  color: var(--gray-800);
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-}
+/* topbar */
+.top{position:sticky;top:0;z-index:50;backdrop-filter:blur(12px);background:rgba(11,13,23,.78);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;height:62px}
+.lock{display:flex;align-items:center;gap:11px}
+.lock img{height:22px}
+.lock .x{color:var(--txt3);font-size:15px}
+.lock .eg{font-size:19px;color:#fff}
+.badge-conf{font-size:11px;font-weight:600;color:var(--txt2);border:1px solid var(--line2);padding:5px 12px;border-radius:999px}
 
-/* NAV */
-.nav {
-  position: sticky; top: 0; z-index: 100;
-  background: rgba(26,26,46,0.97);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(105,54,236,0.3);
-  padding: 0 24px;
-}
-.nav-inner {
-  max-width: 1280px; margin: 0 auto;
-  display: flex; align-items: center; justify-content: space-between;
-  height: 64px;
-}
-.nav-brand {
-  display: flex; align-items: center; gap: 16px;
-}
-.nav-brand img { height: 28px; }
-.nav-brand .x { color: var(--gray-400); font-size: 14px; }
-.nav-brand .egery { color: var(--purple-light); font-weight: 700; font-size: 15px; letter-spacing: -0.3px; }
-.nav-links {
-  display: flex; gap: 4px;
-}
-.nav-link {
-  padding: 8px 14px; border-radius: var(--radius-xs);
-  color: var(--gray-400); font-size: 13px; font-weight: 500;
-  cursor: pointer; transition: all 0.2s; border: none; background: none;
-  white-space: nowrap;
-}
-.nav-link:hover { color: #fff; background: rgba(255,255,255,0.08); }
-.nav-link.active { color: #fff; background: var(--purple); }
-.nav-badge {
-  display: inline-block; padding: 2px 8px; border-radius: 99px;
-  font-size: 10px; font-weight: 700; background: var(--purple);
-  color: #fff; margin-left: 6px; vertical-align: middle;
-}
-.nav-status {
-  display: flex; align-items: center; gap: 8px;
-  color: var(--gray-400); font-size: 12px;
-}
-.nav-status .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+/* hero */
+.hero{position:relative;overflow:hidden;padding:90px 0 70px;border-bottom:1px solid var(--line)}
+.hero::before{content:"";position:absolute;width:760px;height:760px;border-radius:50%;right:-280px;top:-340px;background:radial-gradient(circle,rgba(105,54,236,.4),transparent 62%);pointer-events:none}
+.hero::after{content:"";position:absolute;width:560px;height:560px;border-radius:50%;left:-260px;bottom:-300px;background:radial-gradient(circle,rgba(13,148,136,.18),transparent 62%);pointer-events:none}
+.hero .wrap{position:relative}
+.hero h1{font-size:54px;font-weight:800;margin:6px 0 14px}
+.hero .sub{font-size:18px;color:var(--txt2);max-width:680px}
+.hero .who{margin-top:18px;color:var(--txt3);font-size:14px}
+.kstrip{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:40px;border:1px solid var(--line2);border-radius:var(--r);overflow:hidden}
+.kstrip .k{padding:20px;border-right:1px solid var(--line)}
+.kstrip .k:last-child{border-right:0}
+.kstrip .v{font-size:27px;font-weight:800}
+.kstrip .d{font-size:11.5px;color:var(--txt3);text-transform:uppercase;letter-spacing:.05em;margin-top:4px}
 
-/* HERO */
-.hero {
-  background: linear-gradient(135deg, var(--dark) 0%, #0F0F23 50%, var(--dark-surface) 100%);
-  padding: 80px 24px 64px;
-  position: relative; overflow: hidden;
-}
-.hero::before {
-  content: ''; position: absolute; top: -200px; right: -200px;
-  width: 600px; height: 600px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(105,54,236,0.15) 0%, transparent 70%);
-}
-.hero::after {
-  content: ''; position: absolute; bottom: -100px; left: -100px;
-  width: 400px; height: 400px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(13,148,136,0.1) 0%, transparent 70%);
-}
-.hero-inner {
-  max-width: 1280px; margin: 0 auto; position: relative; z-index: 1;
-}
-.hero-tag {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 6px 16px; border-radius: 99px;
-  background: rgba(105,54,236,0.15); border: 1px solid rgba(105,54,236,0.3);
-  color: var(--purple-light); font-size: 13px; font-weight: 600;
-  margin-bottom: 24px;
-}
-.hero h1 {
-  font-size: clamp(32px, 5vw, 56px); font-weight: 800;
-  color: #fff; line-height: 1.1; margin-bottom: 16px;
-  letter-spacing: -1.5px;
-}
-.hero h1 .gradient {
-  background: linear-gradient(135deg, var(--purple-light), var(--teal-light));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-}
-.hero-sub {
-  font-size: 18px; color: var(--gray-400); max-width: 640px;
-  margin-bottom: 40px; line-height: 1.7;
-}
-.hero-stats {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
-  max-width: 720px;
-}
-.hero-stat {
-  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
-  border-radius: var(--radius-sm); padding: 20px 16px; text-align: center;
-}
-.hero-stat .num {
-  font-size: 28px; font-weight: 800; color: #fff;
-  letter-spacing: -1px;
-}
-.hero-stat .num.purple { color: var(--purple-light); }
-.hero-stat .num.teal { color: var(--teal-light); }
-.hero-stat .label {
-  font-size: 11px; color: var(--gray-400); margin-top: 4px;
-  text-transform: uppercase; letter-spacing: 0.5px;
-}
+/* sections */
+section{padding:64px 0;border-bottom:1px solid var(--line)}
+.sec-h{font-size:30px;font-weight:800;margin-bottom:8px}
+.sec-s{color:var(--txt2);margin-bottom:30px;max-width:640px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{background:var(--surf);border:1px solid var(--line);border-radius:var(--r);padding:22px}
+.card.tt{border-top:3px solid var(--teal)} .card.tp{border-top:3px solid var(--purple)} .card.to{border-top:3px solid var(--orange)} .card.tpl{border-top:3px solid var(--purple-l)}
+.card h3{font-size:18px;font-weight:700;margin-bottom:12px}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:14px}
+.kv:last-child{border-bottom:0}
+.kv b{font-weight:700}
+.trig{font-size:13px;background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.25);color:#fbbf85;border-radius:10px;padding:10px 12px;margin:10px 0}
+.vname{font-size:17px;font-weight:700;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.pill{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:7px}
+.pill.hot{background:rgba(249,115,22,.16);color:#fbbf85} .pill.prio{background:rgba(13,148,136,.16);color:var(--teal-l)} .pill.sig{background:rgba(139,92,246,.16);color:var(--purple-l)}
 
-/* SECTIONS */
-.section {
-  display: none; padding: 48px 24px;
-}
-.section.active { display: block; }
-.section-inner {
-  max-width: 1280px; margin: 0 auto;
-}
-.section-header {
-  margin-bottom: 40px;
-}
-.section-header .tag {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 4px 12px; border-radius: 99px; font-size: 12px;
-  font-weight: 600; margin-bottom: 12px;
-}
-.section-header .tag.purple { background: var(--purple-bg2); color: var(--purple); }
-.section-header .tag.teal { background: var(--teal-bg); color: var(--teal); }
-.section-header .tag.orange { background: var(--orange-bg); color: var(--orange); }
-.section-header .tag.green { background: var(--green-bg); color: var(--green); }
-.section-header h2 {
-  font-size: 32px; font-weight: 800; color: var(--gray-900);
-  letter-spacing: -0.8px; margin-bottom: 8px;
-}
-.section-header p {
-  font-size: 16px; color: var(--gray-500); max-width: 640px;
-}
+/* funnel */
+.funnel{display:flex;flex-direction:column;gap:9px}
+.frow{display:flex;align-items:center;gap:14px}
+.fbar{height:34px;border-radius:8px;background:linear-gradient(90deg,var(--purple),var(--purple-l));display:flex;align-items:center;padding-left:14px;font-weight:700;font-size:13px;color:#fff;white-space:nowrap}
+.flab{width:150px;font-size:13px;color:var(--txt2);text-align:right;flex-shrink:0}
 
-/* CARDS */
-.card {
-  background: #fff; border-radius: var(--radius);
-  border: 1px solid var(--gray-200);
-  padding: 28px; margin-bottom: 16px;
-  transition: all 0.2s;
-}
-.card:hover { border-color: var(--purple); box-shadow: 0 4px 24px rgba(105,54,236,0.08); }
-.card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
-.card-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-.card-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-.card h3 {
-  font-size: 18px; font-weight: 700; color: var(--gray-900);
-  margin-bottom: 12px; display: flex; align-items: center; gap: 10px;
-}
-.card h3 .icon {
-  width: 36px; height: 36px; border-radius: var(--radius-xs);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px; flex-shrink: 0;
-}
-.card h3 .icon.purple { background: var(--purple-bg2); }
-.card h3 .icon.teal { background: var(--teal-bg); }
-.card h3 .icon.orange { background: var(--orange-bg); }
-.card h3 .icon.green { background: var(--green-bg); }
-.card h3 .icon.dark { background: var(--gray-100); }
-.card p { font-size: 14px; color: var(--gray-600); line-height: 1.7; }
-.card .badge {
-  display: inline-block; padding: 3px 10px; border-radius: 99px;
-  font-size: 11px; font-weight: 600;
-}
-.badge.purple { background: var(--purple-bg2); color: var(--purple); }
-.badge.teal { background: var(--teal-bg); color: var(--teal); }
-.badge.green { background: var(--green-bg); color: var(--green); }
-.badge.orange { background: var(--orange-bg); color: var(--orange); }
+/* table */
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--txt3);padding:10px 12px;border-bottom:1px solid var(--line2)}
+td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+.tt-teal{color:var(--teal-l);font-weight:700} .tt-p{color:var(--purple-l);font-weight:700} .tt-g{color:var(--green);font-weight:700}
 
-/* TABLE */
-.data-table {
-  width: 100%; border-collapse: separate; border-spacing: 0;
-  border-radius: var(--radius-sm); overflow: hidden;
-  border: 1px solid var(--gray-200); background: #fff;
-  margin-bottom: 16px;
-}
-.data-table th {
-  background: var(--dark); color: #fff; padding: 14px 16px;
-  font-size: 12px; font-weight: 600; text-align: left;
-  text-transform: uppercase; letter-spacing: 0.5px;
-}
-.data-table th.purple { background: var(--purple); }
-.data-table th.teal { background: var(--teal); }
-.data-table td {
-  padding: 12px 16px; font-size: 13px; color: var(--gray-700);
-  border-bottom: 1px solid var(--gray-100);
-}
-.data-table tr:last-child td { border-bottom: none; }
-.data-table tr:hover td { background: var(--gray-50); }
-.data-table .bold { font-weight: 600; color: var(--gray-900); }
-.data-table .purple-text { color: var(--purple); font-weight: 600; }
-.data-table .teal-text { color: var(--teal); font-weight: 600; }
-.data-table .green-text { color: var(--green); font-weight: 600; }
-.data-table .highlight-row td { background: var(--purple-bg); }
-.data-table .total-row td { background: var(--purple-bg2); font-weight: 700; }
+/* proof leads */
+.leadcard{background:var(--surf2);border:1px solid var(--line);border-radius:13px;padding:15px 16px}
+.leadcard .co{font-weight:700;font-size:15px}
+.leadcard .me{font-size:12.5px;color:var(--txt2);margin-top:3px}
+.leadcard .se{font-size:11px;color:var(--teal-l);margin-top:8px;font-weight:600}
+.note{font-size:13px;color:var(--txt2);background:rgba(105,54,236,.07);border:1px solid rgba(105,54,236,.2);border-radius:10px;padding:12px 14px;margin-top:18px}
 
-/* TUNNEL FLOW */
-.flow {
-  display: flex; gap: 12px; overflow-x: auto; padding: 8px 0;
-}
-.flow-step {
-  flex: 1; min-width: 200px;
-  background: #fff; border-radius: var(--radius-sm);
-  border: 1px solid var(--gray-200); padding: 20px;
-  position: relative;
-}
-.flow-step::after {
-  content: '\2192'; position: absolute; right: -18px; top: 50%;
-  transform: translateY(-50%); color: var(--gray-300); font-size: 20px;
-}
-.flow-step:last-child::after { display: none; }
-.flow-step .num {
-  width: 28px; height: 28px; border-radius: 50%;
-  background: var(--purple); color: #fff; font-size: 13px;
-  font-weight: 700; display: flex; align-items: center;
-  justify-content: center; margin-bottom: 12px;
-}
-.flow-step h4 { font-size: 14px; font-weight: 700; color: var(--gray-900); margin-bottom: 6px; }
-.flow-step p { font-size: 12px; color: var(--gray-500); }
-
-/* KPI TILES */
-.kpi-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;
-  margin-bottom: 24px;
-}
-.kpi {
-  background: #fff; border-radius: var(--radius-sm);
-  border: 1px solid var(--gray-200); padding: 20px;
-  text-align: center;
-}
-.kpi .val {
-  font-size: 32px; font-weight: 800; letter-spacing: -1px;
-  margin-bottom: 4px;
-}
-.kpi .val.purple { color: var(--purple); }
-.kpi .val.teal { color: var(--teal); }
-.kpi .val.green { color: var(--green); }
-.kpi .val.orange { color: var(--orange); }
-.kpi .desc {
-  font-size: 12px; color: var(--gray-500); text-transform: uppercase;
-  letter-spacing: 0.5px; font-weight: 500;
-}
-
-/* CHART */
-.chart-card {
-  background: #fff; border-radius: var(--radius);
-  border: 1px solid var(--gray-200); padding: 28px;
-  margin-bottom: 16px;
-}
-.chart-card h3 {
-  font-size: 16px; font-weight: 700; color: var(--gray-900);
-  margin-bottom: 20px;
-}
-
-/* QUOTE */
-.quote {
-  background: linear-gradient(135deg, var(--purple), var(--purple-dark));
-  border-radius: var(--radius); padding: 32px;
-  color: #fff; margin: 24px 0;
-}
-.quote p {
-  font-size: 20px; font-weight: 600; line-height: 1.5;
-  font-style: italic;
-}
-.quote .author {
-  font-size: 13px; color: rgba(255,255,255,0.6);
-  margin-top: 12px; font-style: normal;
-}
-
-/* MOBILE MENU TOGGLE */
-.nav-toggle {
-  display: none;
-  background: none; border: none; cursor: pointer;
-  width: 36px; height: 36px; border-radius: var(--radius-xs);
-  align-items: center; justify-content: center;
-  color: #fff; font-size: 22px;
-  transition: background 0.2s;
-}
-.nav-toggle:hover { background: rgba(255,255,255,0.1); }
-
-/* RESPONSIVE */
-@media (max-width: 1024px) {
-  .nav-links { overflow-x: auto; padding: 8px 0; gap: 2px; }
-  .nav-link { padding: 6px 10px; font-size: 12px; }
-  .card-grid-3 { grid-template-columns: 1fr 1fr; }
-  .hero-stats { grid-template-columns: repeat(2, 1fr); }
-  .kpi-grid { grid-template-columns: repeat(2, 1fr) !important; }
-  .nav-status { display: none; }
-}
-
-@media (max-width: 768px) {
-  .nav { padding: 0 16px; }
-  .nav-inner { height: 56px; }
-  .nav-toggle { display: flex; }
-  .nav-links {
-    display: none;
-    position: absolute; top: 56px; left: 0; right: 0;
-    background: rgba(26,26,46,0.98);
-    backdrop-filter: blur(20px);
-    flex-direction: column; padding: 12px 16px;
-    border-bottom: 1px solid rgba(105,54,236,0.3);
-    gap: 4px;
-  }
-  .nav-links.open { display: flex; }
-  .nav-link { text-align: left; padding: 12px 16px; border-radius: var(--radius-xs); font-size: 14px; }
-  .nav-status { display: none; }
-  .nav-brand .x, .nav-brand .egery { display: none; }
-
-  /* HERO */
-  .hero { padding: 48px 16px 40px; }
-  .hero h1 { font-size: 28px; letter-spacing: -0.8px; }
-  .hero-sub { font-size: 15px; margin-bottom: 28px; }
-  .hero-stats { grid-template-columns: 1fr 1fr; gap: 10px; }
-  .hero-stat { padding: 14px 12px; }
-  .hero-stat .num { font-size: 22px; }
-  .hero-stat .label { font-size: 10px; }
-
-  /* SECTIONS */
-  .section { padding: 32px 16px; }
-  .section-header h2 { font-size: 24px; }
-  .section-header p { font-size: 14px; }
-
-  /* CARDS */
-  .card { padding: 20px; }
-  .card-grid, .card-grid-2, .card-grid-3 { grid-template-columns: 1fr; gap: 12px; }
-  .card h3 { font-size: 16px; }
-
-  /* KPI */
-  .kpi-grid { grid-template-columns: 1fr 1fr !important; gap: 10px; }
-  .kpi { padding: 14px 10px; }
-  .kpi .val { font-size: 24px; }
-  .kpi .desc { font-size: 10px; }
-
-  /* TABLES — horizontal scroll */
-  .data-table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  .data-table thead, .data-table tbody, .data-table tr { min-width: 600px; display: table; width: 100%; table-layout: auto; }
-  .data-table th, .data-table td { padding: 10px 12px; font-size: 12px; white-space: nowrap; }
-
-  /* FLOW */
-  .flow { flex-direction: column; gap: 8px; }
-  .flow-step { min-width: unset; padding: 16px; }
-  .flow-step::after { display: none; }
-
-  /* CHART */
-  .chart-card { padding: 16px; }
-  .chart-card h3 { font-size: 14px; margin-bottom: 12px; }
-
-  /* QUOTE */
-  .quote { padding: 24px 20px; }
-  .quote p { font-size: 16px; }
-
-  /* TIMELINE */
-  .timeline { padding-left: 32px; }
-  .timeline-item .dot { left: -25px; width: 12px; height: 12px; }
-}
-
-@media (max-width: 380px) {
-  .hero h1 { font-size: 24px; }
-  .hero-stats { grid-template-columns: 1fr; }
-  .kpi-grid { grid-template-columns: 1fr !important; }
-  .nav-brand img { height: 22px; }
-}
-
-/* TIMELINE */
-.timeline { position: relative; padding-left: 40px; }
-.timeline::before {
-  content: ''; position: absolute; left: 15px; top: 0; bottom: 0;
-  width: 2px; background: linear-gradient(to bottom, var(--purple), var(--teal));
-}
-.timeline-item { position: relative; margin-bottom: 24px; }
-.timeline-item .dot {
-  position: absolute; left: -33px; top: 4px;
-  width: 14px; height: 14px; border-radius: 50%;
-  border: 3px solid var(--purple); background: #fff;
-}
-.timeline-item h4 {
-  font-size: 15px; font-weight: 700; color: var(--gray-900);
-  margin-bottom: 4px;
-}
-.timeline-item .timing {
-  font-size: 12px; font-weight: 600; color: var(--purple);
-  margin-bottom: 6px;
-}
-.timeline-item p { font-size: 13px; color: var(--gray-600); }
-
-/* SIGNAL TABLE */
-.signal-cat {
-  display: inline-block; padding: 3px 10px; border-radius: 99px;
-  font-size: 11px; font-weight: 600;
-}
+/* cta */
+.cta{text-align:center;padding:70px 0}
+.cta h2{font-size:34px;font-weight:800;margin-bottom:14px}
+.btn{display:inline-block;margin-top:22px;background:linear-gradient(100deg,var(--purple),var(--purple-l));color:#fff;font-weight:700;font-size:15px;padding:15px 30px;border-radius:12px}
+.foot{padding:30px 0 60px;text-align:center;color:var(--txt3);font-size:12.5px;line-height:1.9}
+.foot .lk{justify-content:center;margin-bottom:10px}
+@media(max-width:820px){.grid2,.grid3,.kstrip{grid-template-columns:1fr}.hero h1{font-size:38px}.flab{width:96px}}
 </style>
 </head>
 <body>
 
-<!-- NAV -->
-<nav class="nav">
-  <div class="nav-inner">
-    <div class="nav-brand">
-      <img src="https://kwantic.fr/logos/logo-kwantic-dark.svg" alt="Kwantic" style="filter: brightness(10);">
-      <span class="x">×</span>
-      <span class="egery">EGERY GROUP</span>
-    </div>
-    <button class="nav-toggle" id="navToggle" aria-label="Menu">☰</button>
-    <div class="nav-links" id="navLinks">
-      <button class="nav-link active" data-section="contexte">Contexte</button>
-      <button class="nav-link" data-section="oracle">Oracle Kwantic</button>
-      <button class="nav-link" data-section="tunnel">Tunnel</button>
-      <button class="nav-link" data-section="stack">Stack & Agents</button>
-      <button class="nav-link" data-section="passeports">Passeports</button>
-      <button class="nav-link" data-section="synergies">Synergies</button>
-      <button class="nav-link" data-section="previsionnel">Prévisionnel<span class="nav-badge">128K€</span></button>
-      <button class="nav-link" data-section="planning">Planning</button>
-      <button class="nav-link" data-section="prediag">Pré-diagnostic<span class="nav-badge">Pappers</span></button>
-    </div>
-    <div class="nav-status">
-      <span class="dot"></span>
-      <span>Confidentiel — Juin 2026</span>
-    </div>
+<div class="top"><div class="wrap">
+  <div class="lock">
+    <img src="https://kwantic.fr/logos/logo-kwantic-white.svg" alt="Kwantic">
+    <span class="x">×</span><span class="eg">egery</span>
   </div>
-</nav>
+  <span class="badge-conf">🔒 Confidentiel · Juin 2026</span>
+</div></div>
 
 <!-- HERO -->
-<div class="hero">
-  <div class="hero-inner">
-    <div class="hero-tag">⚡ BRIEF STRATÉGIQUE — DOCUMENT CONFIDENTIEL</div>
-    <h1>Croissance prédictive<br>pour <span class="gradient">Kwantic</span></h1>
-    <p class="hero-sub">Détection IA × tunnel d’acquisition × CTO externalisé. Un écosystème complet pour identifier les besoins de transformation digitale avant même que les prospects ne le sachent.</p>
-    <div class="hero-stats">
-      <div class="hero-stat">
-        <div class="num">~35</div>
-        <div class="label">Collaborateurs</div>
-      </div>
-      <div class="hero-stat">
-        <div class="num purple">+100</div>
-        <div class="label">Clients actifs</div>
-      </div>
-      <div class="hero-stat">
-        <div class="num teal">97M€</div>
-        <div class="label">GMV générés</div>
-      </div>
-      <div class="hero-stat">
-        <div class="num">+50%</div>
-        <div class="label">Croissance/an</div>
-      </div>
+<div class="hero"><div class="wrap">
+  <div class="tag">Mission Growth / CRO externalisé</div>
+  <h1>Croissance <span class="grad">prédictive</span><br>pour Kwantic</h1>
+  <p class="sub">Détection IA × Tunnel d'acquisition × CTO externalisé. Egery réplique pour Kwantic l'écosystème d'acquisition prédictif d'Alvo — Oracle de marché, agents IA, cockpits, conversion.</p>
+  <p class="who">Proposition de collaboration · Egery Group pour Kwantic — Benjamin Queroy &amp; Stéphane Catherine</p>
+  <div class="kstrip">
+    <div class="k"><div class="v grad">128,6 K€</div><div class="d">Projection 6 mois</div></div>
+    <div class="k"><div class="v">48,5 K€</div><div class="d">L1 · setup + MRR</div></div>
+    <div class="k"><div class="v">80 K€</div><div class="d">L2 · 1er gros projet</div></div>
+    <div class="k"><div class="v">430</div><div class="d">Leads adressables</div></div>
+  </div>
+</div></div>
+
+<!-- 01 OPPORTUNITÉ -->
+<section><div class="wrap">
+  <div class="tag">01 — L'opportunité</div>
+  <div class="sec-h">L'opportunité <span class="grad">Kwantic × Egery</span></div>
+  <p class="sec-s">Une agence de transformation digitale B2B aux fondations solides, à qui il manque une machine d'acquisition prédictive. C'est exactement ce qu'Egery opère pour Alvo.</p>
+  <div class="grid2">
+    <div class="card tt">
+      <h3>Kwantic aujourd'hui</h3>
+      <div class="kv"><span>GMV générée pour les clients</span><b>97 M€</b></div>
+      <div class="kv"><span>Clients satisfaits post-lancement</span><b>88 %</b></div>
+      <div class="kv"><span>Collaborateurs</span><b>~35</b></div>
+      <div class="kv"><span>Implantations</span><b>6</b></div>
+      <div class="kv"><span>Paid / SEA</span><b>actif (à industrialiser)</b></div>
+    </div>
+    <div class="card tp">
+      <h3>4 pôles d'expertise</h3>
+      <div class="kv"><span>Expérience digitale</span><b>e-comm B2B · UX/UI</b></div>
+      <div class="kv"><span>Applications métier</span><b>intranet · extranet</b></div>
+      <div class="kv"><span>ERP &amp; CRM</span><b>Odoo · Dynamics</b></div>
+      <div class="kv"><span>Marketing B2B</span><b>SEO · SEA</b></div>
+      <div class="kv"><span>Stack européenne</span><b>85 %</b></div>
     </div>
   </div>
-</div>
+  <div class="card" style="margin-top:18px">
+    <h3>Le croisement Alvo × Kwantic</h3>
+    <div class="kv"><span><b>Repreneurs Alvo</b> — audit digital de la cible</span><span class="muted">Kwantic optimise le SI de la cible</span></div>
+    <div class="kv"><span><b>Cédants Alvo</b> — préparation à la cession</span><span class="muted">Kwantic prospecte en amont (audit gratuit)</span></div>
+    <div class="kv"><span><b>Valorisation</b> — modernisation digitale</span><span class="muted">Kwantic améliore la valo</span></div>
+  </div>
+</div></section>
 
-<!-- SECTION: CONTEXTE -->
-<div class="section active" id="contexte">
-  <div class="section-inner">
-    <div class="section-header">
-      <div class="tag purple">01 — CONTEXTE</div>
-      <h2>L’opportunité Kwantic × Egery</h2>
-      <p>Répliquer l’écosystème d’acquisition prédictif d’Alvo pour la transformation digitale B2B</p>
+<!-- 02 ORACLE -->
+<section><div class="wrap">
+  <div class="tag">02 — Oracle Kwantic</div>
+  <div class="sec-h">Le marché, <span class="grad">scanné par l'IA</span></div>
+  <p class="sec-s">14 signaux qualifiés sur 3 verticales prioritaires, 0 API payante. Produits par l'Oracle (WebSearch + OSINT). C'est le moteur qu'on déploie pour chaque prospect Kwantic.</p>
+  <div class="grid3">
+    <div class="card tt">
+      <div class="vname">E-commerce B2B <span class="pill prio">PRIO</span></div>
+      <div class="trig">⚡ Facturation électronique obligatoire <b>sept. 2026</b> — déclencheur réglementaire pour toutes les entreprises.</div>
+      <div class="kv"><span>Marché</span><b>360 Md€ · +4%</b></div>
+      <div class="kv"><span>GenAI adoptée</span><b>82 %</b></div>
+      <div class="kv"><span>Budget projet</span><b>8–25 K€</b></div>
     </div>
-
-    <div class="card-grid">
-      <div class="card">
-        <h3><span class="icon purple">🔮</span> Ce qu’on a construit chez Alvo</h3>
-        <p>Écosystème complet d’acquisition et de conversion piloté par l’IA, qui génère des mandats de cession de manière prédictive.</p>
-        <div style="margin-top:16px; display:flex; flex-direction:column; gap:8px;">
-          <div style="display:flex; align-items:center; gap:8px;"><span class="badge purple">Oracle Transmission</span><span style="font-size:12px; color:var(--gray-500);">Moteur OSINT prédictif 15+ sources</span></div>
-          <div style="display:flex; align-items:center; gap:8px;"><span class="badge teal">Enrichissement</span><span style="font-size:12px; color:var(--gray-500);">Apollo, Pappers, Datagma, Aircall, Brevo</span></div>
-          <div style="display:flex; align-items:center; gap:8px;"><span class="badge green">Pipeline auto</span><span style="font-size:12px; color:var(--gray-500);">VDD, analyse 360°, matching, teasers</span></div>
-          <div style="display:flex; align-items:center; gap:8px;"><span class="badge orange">Conversion</span><span style="font-size:12px; color:var(--gray-500);">Séquences Brevo, Aircall, HubSpot CRM</span></div>
-        </div>
-      </div>
-      <div class="card">
-        <h3><span class="icon teal">🚀</span> L’opportunité Kwantic</h3>
-        <p>Kwantic est une agence de transformation digitale B2B (+35 collab., +100 clients actifs, +50% croissance/an). 4 pôles : expérience digitale, applications métier, ERP/CRM, marketing.</p>
-        <p style="margin-top:12px; font-weight:600; color:var(--purple);">L’idée : répliquer le modèle Oracle pour créer un tunnel d’acquisition prédictif en détectant les sociétés qui ont besoin de transformation digitale avant qu’elles ne le sachent.</p>
-      </div>
+    <div class="card to">
+      <div class="vname">PME industrielles <span class="pill hot">HOT</span></div>
+      <div class="trig">⚡ Budget digital <b>×2.2</b> (75 K€) · 42 % investissent l'IA · cycle L2 (80–120 K€) aligné.</div>
+      <div class="kv"><span>PME pro-digital</span><b>82 %</b></div>
+      <div class="kv"><span>Gains ERP+IA</span><b>30–40 %</b></div>
+      <div class="kv"><span>Aide Nouvelle-Aquitaine</span><b>jusqu'à 50 %</b></div>
     </div>
-
-    <div class="card" style="margin-top:16px;">
-      <h3><span class="icon dark">🔗</span> Le croisement Alvo × Kwantic</h3>
-      <div class="card-grid" style="margin-top:12px;">
-        <div style="padding:16px; background:var(--purple-bg); border-radius:var(--radius-sm);">
-          <div style="font-size:13px; font-weight:700; color:var(--purple); margin-bottom:6px;">Repreneur acquiert une PME via Alvo →</div>
-          <div style="font-size:13px; color:var(--gray-600);">Kwantic audite et optimise le système digital de la cible</div>
-        </div>
-        <div style="padding:16px; background:var(--teal-bg); border-radius:var(--radius-sm);">
-          <div style="font-size:13px; font-weight:700; color:var(--teal); margin-bottom:6px;">Oracle détecte failles tech →</div>
-          <div style="font-size:13px; color:var(--gray-600);">Kwantic prospecte en amont avec un audit gratuit</div>
-        </div>
-        <div style="padding:16px; background:var(--green-bg); border-radius:var(--radius-sm);">
-          <div style="font-size:13px; font-weight:700; color:var(--green); margin-bottom:6px;">Cédant en préparation →</div>
-          <div style="font-size:13px; color:var(--gray-600);">Kwantic améliore la valorisation en modernisant le digital</div>
-        </div>
-      </div>
+    <div class="card tpl">
+      <div class="vname">Services B2B <span class="pill sig">SIGNAL</span></div>
+      <div class="trig">⚡ 1/3 sans stratégie data · profils IA <b>introuvables en interne</b> → externalisation du paramétrage.</div>
+      <div class="kv"><span>Dirigeants pro-digital</span><b>78 %</b></div>
+      <div class="kv"><span>IA demandée</span><b>mkg · commercial · support</b></div>
+      <div class="kv"><span>France Num</span><b>4 000+ activateurs</b></div>
     </div>
   </div>
-</div>
+</div></section>
 
-<!-- SECTION: ORACLE -->
-<div class="section" id="oracle">
-  <div class="section-inner">
-    <div class="section-header">
-      <div class="tag purple">02 — ORACLE KWANTIC</div>
-      <h2>Moteur prédictif de détection</h2>
-      <p>Signaux faibles pour détecter les besoins de transformation digitale</p>
+<!-- 03 PREUVE -->
+<section><div class="wrap">
+  <div class="tag">03 — Preuve marché</div>
+  <div class="sec-h"><span class="grad">30 décideurs</span> déjà identifiés</div>
+  <p class="sec-s">L'Oracle n'est pas une promesse : 30 décideurs réels (10 par verticale) ont été sourcés et enrichis (email vérifié pour 25). Voici 6 exemples — la liste complète enrichie est transmise en privé.</p>
+  <div class="grid3">
+    <div class="leadcard"><div class="co">Proditec</div><div class="me">CEO · Bordeaux — vision industrielle / IA pharma</div><div class="se">PME industrielle · email vérifié</div></div>
+    <div class="leadcard"><div class="co">Fermentalg</div><div class="me">Dir. Opérations · Libourne — biotech coté Euronext</div><div class="se">PME industrielle · email vérifié</div></div>
+    <div class="leadcard"><div class="co">Château d'Yquem</div><div class="me">CEO · Sauternes — grand cru, groupe LVMH</div><div class="se">PME industrielle · email vérifié</div></div>
+    <div class="leadcard"><div class="co">Graines Voltz</div><div class="me">CEO · Angers — leader FR semences B2B</div><div class="se">E-commerce B2B · email vérifié</div></div>
+    <div class="leadcard"><div class="co">LTTD Consulting</div><div class="me">CEO · Nantes — intégrateur ERP Infor</div><div class="se">Services B2B · email vérifié</div></div>
+    <div class="leadcard"><div class="co">Nordnet (groupe Orange)</div><div class="me">Dir. Opérations · Villeneuve-d'Ascq</div><div class="se">Services B2B · email vérifié</div></div>
+  </div>
+  <div class="note">🔒 Les coordonnées des 30 décideurs (emails vérifiés) sont volontairement <b>non publiées ici</b> et transmises à Kwantic par canal privé — conformité &amp; confidentialité.</div>
+</div></section>
+
+<!-- 04 TUNNEL -->
+<section><div class="wrap">
+  <div class="tag">04 — Tunnel &amp; prévisionnel</div>
+  <div class="sec-h">Prévisionnel <span class="grad">6 mois</span> — prudent</div>
+  <p class="sec-s">Taux calibrés sur le tunnel réel d'Alvo. Scénario volontairement pessimiste.</p>
+  <div class="grid2" style="align-items:start">
+    <div class="card">
+      <div class="funnel">
+        <div class="frow"><div class="flab">Leads adressables</div><div class="fbar" style="width:100%">430</div></div>
+        <div class="frow"><div class="flab">Répondus (30%)</div><div class="fbar" style="width:75%">129</div></div>
+        <div class="frow"><div class="flab">RDV pris (25%)</div><div class="fbar" style="width:48%">33</div></div>
+        <div class="frow"><div class="flab">RDV réalisés</div><div class="fbar" style="width:40%;background:linear-gradient(90deg,var(--teal),var(--teal-l))">26</div></div>
+        <div class="frow"><div class="flab">Propositions</div><div class="fbar" style="width:30%;background:linear-gradient(90deg,var(--orange),#fbbf85)">15</div></div>
+        <div class="frow"><div class="flab">Signatures L1</div><div class="fbar" style="width:18%;background:linear-gradient(90deg,var(--green),#5ee0a8)">4</div></div>
+      </div>
     </div>
+    <div class="card tp">
+      <h3>Revenus projetés</h3>
+      <div class="kv"><span>L1 — setup + MRR</span><b class="tt-teal">48,5 K€</b></div>
+      <div class="kv"><span>L2 — 1er gros projet ERP/CRM</span><b style="color:var(--orange)">80 K€</b></div>
+      <div class="kv"><span>Total 6 mois (pessimiste)</span><b class="tt-p">128,6 K€</b></div>
+      <p class="muted" style="font-size:13px;margin-top:12px">L1 : setup 5–30 K€ + MRR 1,5–5 K€/mois · L2 : 80–120 K€.</p>
+    </div>
+  </div>
+</div></section>
 
-    <table class="data-table">
-      <thead><tr>
-        <th class="purple">Catégorie</th><th class="purple">Signal</th><th class="purple">Source</th>
-      </tr></thead>
+<!-- 05 MODÈLE -->
+<section><div class="wrap">
+  <div class="tag">05 — Modèle commercial</div>
+  <div class="sec-h">Un échange de services, <span class="grad">zéro cash flow</span></div>
+  <p class="sec-s">Egery opère le growth/CRO pour Kwantic ; Kwantic opère le product management pour Alvo. Chacun paie ses outils.</p>
+  <div class="card" style="padding:8px 10px">
+    <table>
+      <thead><tr><th>Source du lead</th><th>Marque</th><th>Commission Egery</th></tr></thead>
       <tbody>
-        <tr><td><span class="signal-cat" style="background:var(--purple-bg2); color:var(--purple);">Recrutement IT</span></td><td>PME/ETI recrute dev, CTO, DSI, chef de projet digital. Annonce ouverte > 60j = difficulté recrutement interne</td><td>Indeed, WTTJ, LinkedIn Jobs, APEC</td></tr>
-        <tr><td><span class="signal-cat" style="background:var(--green-bg); color:var(--green);">Stack obsolète</span></td><td>Site WordPress ancien, Drupal, Joomla, Magento 1, PHP < 8, HTTP sans SSL</td><td>Wappalyzer API, BuiltWith</td></tr>
-        <tr><td><span class="signal-cat" style="background:var(--green-bg); color:var(--green);">Performance web</span></td><td>Lighthouse < 50, PageSpeed lent, pas de mobile-first, erreurs 404 massives</td><td>PageSpeed API, Screaming Frog</td></tr>
-        <tr><td><span class="signal-cat" style="background:var(--orange-bg); color:var(--orange);">SEO défaillant</span></td><td>DA < 20, chute trafic organique, 0 backlinks, pas de blog</td><td>Ahrefs/SEMrush, SimilarWeb</td></tr>
-        <tr><td><span class="signal-cat" style="background:var(--red-bg); color:#EF4444;">Croissance rapide</span></td><td>CA en hausse > 20%/an, recrutement massif, nouveau site/ERP nécessaire</td><td>Pappers, BODACC, presse</td></tr>
-        <tr><td><span class="signal-cat" style="background:var(--purple-bg); color:var(--purple);">Post-acquisition</span></td><td>Société rachetée récemment, besoin refonte digitale post-intégration</td><td>CFNEWS, BODACC, Alvo mandats</td></tr>
-        <tr><td><span class="signal-cat" style="background:var(--purple-bg); color:var(--purple);">Levée de fonds</span></td><td>Startup/PME lève des fonds, doit accélérer sa stack tech</td><td>CFNEWS, Les Echos, LinkedIn</td></tr>
-        <tr><td><span class="signal-cat" style="background:var(--teal-bg); color:var(--teal);">Signal IA</span></td><td>Dirigeant parle d’IA mais n’a pas d’équipe tech, cherche à implémenter</td><td>LinkedIn posts, médias, conférences</td></tr>
-      </tbody>
-    </table>
-
-    <div class="quote">
-      <p>Un signal isolé ne suffit pas. La valeur est dans le croisement multi-sources — même logique que l’Oracle Transmission d’Alvo.</p>
-      <div class="author">Principe fondamental du détective OSINT</div>
-    </div>
-
-    <div class="card-grid">
-      <div class="card">
-        <h3><span class="icon purple">🔺</span> Triple convergence tech</h3>
-        <p>Site obsolète + recrutement dev échoué + CA en hausse = <strong>besoin d’externalisation digitale quasi-certain</strong></p>
-      </div>
-      <div class="card">
-        <h3><span class="icon teal">📈</span> Croissance sans tech</h3>
-        <p>Croissance > 20% + 0 recrutement IT + Lighthouse < 40 = <strong>infrastructure qui ne suit pas la croissance</strong></p>
-      </div>
-      <div class="card">
-        <h3><span class="icon green">🤝</span> Post-acquisition Alvo</h3>
-        <p>Repreneur signé via Alvo + société cible sans CRM/ERP = <strong>cross-sell immédiat</strong></p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- SECTION: TUNNEL -->
-<div class="section" id="tunnel">
-  <div class="section-inner">
-    <div class="section-header">
-      <div class="tag teal">03 — TUNNEL DE CONVERSION</div>
-      <h2>De la détection au MRR</h2>
-      <p>L’audit-cockpit : montrer avant de vendre</p>
-    </div>
-
-    <div class="flow">
-      <div class="flow-step"><div class="num">1</div><h4>Détection Oracle</h4><p>Scan quotidien multi-sources. 5-15 sociétés/jour qualifiées.</p></div>
-      <div class="flow-step"><div class="num">2</div><h4>Enrichissement</h4><p>Pappers + Apollo + Lighthouse + Wappalyzer. Cockpit auto-généré.</p></div>
-      <div class="flow-step"><div class="num">3</div><h4>Outreach multicanal</h4><p>J0 Email Brevo + J1 Droper vocal + J3 Relance + J7 LinkedIn</p></div>
-      <div class="flow-step"><div class="num">4</div><h4>RDV Diagnostic</h4><p>30 min en visio. Présentation cockpit en live. Rapport offert.</p></div>
-      <div class="flow-step"><div class="num">5</div><h4>Projet + MRR</h4><p>Setup 1-4 sem. puis accompagnement mensuel CTO externalisé.</p></div>
-    </div>
-
-    <div class="card" style="margin-top:24px;">
-      <h3><span class="icon purple">🎯</span> L’approche : le cockpit personnalisé</h3>
-      <p style="margin-bottom:16px;">Dans le premier email de prospection, on intègre un lien vers un cockpit personnalisé qui contient déjà :</p>
-      <div class="card-grid" style="gap:12px;">
-        <div style="padding:16px; background:var(--teal-bg); border-radius:var(--radius-sm);">
-          <div style="font-weight:700; color:var(--teal); font-size:13px;">AUDIT TECHNIQUE</div>
-          <div style="font-size:12px; color:var(--gray-600); margin-top:4px;">Score Lighthouse, stack technique, SSL, mobile-first, temps de chargement</div>
-        </div>
-        <div style="padding:16px; background:var(--teal-bg); border-radius:var(--radius-sm);">
-          <div style="font-weight:700; color:var(--teal); font-size:13px;">AUDIT SEO</div>
-          <div style="font-size:12px; color:var(--gray-600); margin-top:4px;">Positions clés, trafic organique, DA, backlinks, benchmark concurrents</div>
-        </div>
-        <div style="padding:16px; background:var(--teal-bg); border-radius:var(--radius-sm);">
-          <div style="font-weight:700; color:var(--teal); font-size:13px;">AUDIT BUSINESS</div>
-          <div style="font-size:12px; color:var(--gray-600); margin-top:4px;">Taux de conversion, tunnel d’acquisition, présence réseaux sociaux</div>
-        </div>
-        <div style="padding:16px; background:var(--teal-bg); border-radius:var(--radius-sm);">
-          <div style="font-weight:700; color:var(--teal); font-size:13px;">DIAGNOSTIC IA</div>
-          <div style="font-size:12px; color:var(--gray-600); margin-top:4px;">Quick wins IA identifiés, ROI estimé par brique, chatbot, automatisation</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="quote">
-      <p>« Sans vous connaître, on connaît déjà vos failles digitales. Imaginez ce qu’on peut faire quand on travaille ensemble. »</p>
-      <div class="author">Proposition de valeur unique — l’effet "wow" de l’audit gratuit</div>
-    </div>
-
-    <table class="data-table" style="margin-top:24px;">
-      <thead><tr>
-        <th>Étape</th><th>Tarification</th><th>Logique</th>
-      </tr></thead>
-      <tbody>
-        <tr><td class="bold">Pré-audit cockpit</td><td class="green-text">GRATUIT</td><td>Lead magnet — coût ~3€/prospect (APIs). Le prospect découvre qu’on connaît déjà ses failles.</td></tr>
-        <tr><td class="bold">RDV diagnostic</td><td class="green-text">GRATUIT</td><td>30 min en visio, rapport complet offert + plan d’action priorisé. Zéro engagement.</td></tr>
-        <tr><td class="bold">Setup projet</td><td class="purple-text">5K€ à 80K€</td><td>Implémentation des recommandations (refonte site, ERP, app métier, stack IA). 1 à 16 semaines.</td></tr>
-        <tr><td class="bold">Accompagnement mensuel</td><td class="teal-text">1 500€ à 5 000€/mois</td><td>CTO / Chief AI Officer / PM externalisé : maintenance, évolutions, veille techno, agents IA, reporting.</td></tr>
+        <tr><td><b>Oracle Kwantic / site kwantic.fr</b></td><td class="tt-teal">100% Kwantic</td><td>10% setup + 10% MRR (12 mois)</td></tr>
+        <tr><td><b>Cross-sell Alvo (repreneur, cédant)</b></td><td class="tt-p">Egery × Kwantic</td><td>15% setup + 15% MRR (12 mois)</td></tr>
+        <tr><td><b>Client Kwantic existant</b></td><td class="tt-teal">100% Kwantic</td><td class="tt-g">0%</td></tr>
+        <tr><td><b>Référence agent Alvo</b></td><td class="tt-teal">Kwantic</td><td>10% du setup</td></tr>
       </tbody>
     </table>
   </div>
-</div>
+  <div class="grid2" style="margin-top:18px">
+    <div class="card tt"><h3 style="color:var(--teal-l)">Kwantic paie</h3><p class="muted">Sa stack outils (~450–550 €/mois) : Brevo, Apollo, Pappers, Supabase, Vercel, Claude.</p></div>
+    <div class="card tp"><h3 style="color:var(--purple-l)">Egery paie</h3><p class="muted">0 € de coût direct — apport en compétence growth/CRO + IA.</p></div>
+  </div>
+</div></section>
 
-<!-- SECTION: STACK -->
-<div class="section" id="stack">
-  <div class="section-inner">
-    <div class="section-header">
-      <div class="tag orange">04 — STACK & AGENTS IA</div>
-      <h2>Architecture technique</h2>
-      <p>Écosystème d’agents autonomes hébergés sur serveur</p>
-    </div>
+<!-- 06 AGENTS -->
+<section><div class="wrap">
+  <div class="tag">06 — Stack IA &amp; agents</div>
+  <div class="sec-h">Les agents IA <span class="grad">déployés pour Kwantic</span></div>
+  <p class="sec-s">Du signal de marché au RDV qualifié — avec validation humaine systématique avant tout envoi.</p>
+  <div class="grid3">
+    <div class="card tp"><h3>🔮 Oracle</h3><p class="muted">Scan multi-sources, croisement de patterns, qualification des leads. Détecte les signaux avant le marché.</p></div>
+    <div class="card tt"><h3>🖥️ Cockpit prospect</h3><p class="muted">Diagnostic 127 points (tech, SEO, growth, social, financier) généré par prospect — l'outil de démonstration de valeur.</p></div>
+    <div class="card to"><h3>🛎️ Notifications &amp; CRM</h3><p class="muted">Push Discord + email + Supabase + deal HubSpot auto à chaque lead HOT / diagnostic prêt / RDV.</p></div>
+  </div>
+  <div class="card" style="margin-top:18px;border-color:rgba(255,88,100,.25);background:rgba(255,88,100,.05)">
+    <h3 style="color:#ffa6ad">🔒 Validation avant envoi — non négociable</h3>
+    <p class="muted">Aucun email ne part sans approbation de Kwantic (Benjamin ou Stéphane). Zéro action irréversible sans validation humaine.</p>
+  </div>
+</div></section>
 
-    <table class="data-table" style="margin-bottom:24px;">
-      <thead><tr>
-        <th>Fonction</th><th>Outil</th><th>Usage</th>
-      </tr></thead>
+<!-- 07 RÉTROPLANNING -->
+<section><div class="wrap">
+  <div class="tag">07 — Rétroplanning</div>
+  <div class="sec-h">6 semaines <span class="grad">de lancement</span></div>
+  <div class="card" style="padding:8px 10px">
+    <table>
+      <thead><tr><th>Semaine</th><th>Chantier</th><th>Livrables</th></tr></thead>
       <tbody>
-        <tr><td class="bold">Détection signaux</td><td>Oracle Kwantic (Claude)</td><td>Scan multi-sources, croisement patterns, qualification leads</td></tr>
-        <tr><td class="bold">Audit technique auto</td><td>Lighthouse + Wappalyzer</td><td>Score perf, stack tech, SSL, mobile, CMS/frameworks</td></tr>
-        <tr><td class="bold">Audit SEO</td><td>PageSpeed + SimilarWeb</td><td>Trafic, positions, DA, concurrents</td></tr>
-        <tr><td class="bold">Enrichissement leads</td><td>Apollo + Datagma</td><td>Email, téléphone dirigeants/décideurs IT</td></tr>
-        <tr><td class="bold">Enrichissement société</td><td>Pappers + INSEE + BODACC</td><td>CA, effectif, dirigeants, âge, comptes, procédures</td></tr>
-        <tr><td class="bold">Campagnes email</td><td>Brevo</td><td>Séquences automatisées J0/J3/J7 avec lien cockpit personnalisé</td></tr>
-        <tr><td class="bold">Messages vocaux</td><td>Droper.ai</td><td>Campagnes vocales ciblées aux dirigeants identifiés</td></tr>
-        <tr><td class="bold">CRM / Pipeline</td><td>HubSpot</td><td>Suivi deals, stages, attribution, reporting</td></tr>
-        <tr><td class="bold">Cockpit prospect</td><td>App React + Supabase</td><td>Page d’audit personnalisée par prospect</td></tr>
-        <tr><td class="bold">Agent IA client</td><td>Claude (API Anthropic)</td><td>Associé virtuel pour les clients Kwantic post-signature</td></tr>
+        <tr><td><b>S1–S2</b></td><td>Audit stack &amp; architecture</td><td>Rapport d'audit, matrice outils, plan d'archi</td></tr>
+        <tr><td><b>S2–S3</b></td><td>Setup outils &amp; config</td><td>Brevo, Apollo/Pappers, Supabase, webhooks Discord</td></tr>
+        <tr><td><b>S3–S4</b></td><td>Agents IA &amp; 1er scan</td><td>Oracle, scripts audit auto, 1er scan marché (50 cibles)</td></tr>
+        <tr><td><b>S4–S5</b></td><td>Cockpit &amp; dashboard</td><td>Cockpit prospect, dashboard interne, workflows</td></tr>
+        <tr><td><b>S5–S6</b></td><td>Lancement campagnes</td><td>Séquences Brevo, 1ers leads, reporting</td></tr>
       </tbody>
     </table>
-
-    <div class="section-header" style="margin-top:40px;">
-      <h2 style="font-size:24px;">Agents IA déployés pour Kwantic</h2>
-    </div>
-    <div class="card-grid">
-      <div class="card">
-        <h3><span class="icon purple">🔮</span> Oracle Kwantic</h3>
-        <p>Scan quotidien multi-sources pour détecter les PME avec signaux de besoin digital (recrutement IT échoué, stack obsolète, croissance sans tech, post-acquisition)</p>
-        <div style="margin-top:8px;"><span class="badge purple">Skill Claude + Supabase + cron</span></div>
-      </div>
-      <div class="card">
-        <h3><span class="icon teal">⚡</span> Agent Audit Auto</h3>
-        <p>Pour chaque cible qualifiée : Lighthouse + Wappalyzer + PageSpeed automatique. Génération du cockpit personnalisé avec score, failles, quick wins.</p>
-        <div style="margin-top:8px;"><span class="badge teal">APIs + React/Supabase</span></div>
-      </div>
-      <div class="card">
-        <h3><span class="icon orange">📧</span> Agent Campagne</h3>
-        <p>Orchestration Brevo (emails) + Droper (vocaux). Personnalisation par prospect. Séquence J0/J1/J3/J7 automatisée.</p>
-        <div style="margin-top:8px;"><span class="badge orange">API Brevo + Droper.ai</span></div>
-      </div>
-      <div class="card">
-        <h3><span class="icon green">🔍</span> Agent Enrichissement</h3>
-        <p>Enrichissement société (Pappers, INSEE) + dirigeant (Apollo, Datagma) pour chaque lead. Production de la fiche complète pour le cockpit.</p>
-        <div style="margin-top:8px;"><span class="badge green">Apollo + Pappers + INSEE</span></div>
-      </div>
-      <div class="card">
-        <h3><span class="icon dark">🔔</span> Agent Notification</h3>
-        <p>Push temps réel dans Discord Kwantic : nouveau passeport, lead HOT, diagnostic prêt, RDV confirmé.</p>
-        <div style="margin-top:8px;"><span class="badge purple">Webhook Discord + Supabase</span></div>
-      </div>
-    </div>
-
-    <div class="card" style="margin-top:16px; border-color:var(--purple);">
-      <h3><span class="icon purple">🖥️</span> Cockpit Kwantic — validation avant envoi</h3>
-      <p>Point critique : aucun email ne part sans approbation de Kwantic (Benjamin ou Stéphane). Zéro action irréversible sans validation humaine.</p>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:16px;">
-        <div style="padding:12px; background:var(--gray-50); border-radius:var(--radius-xs); font-size:13px;">✅ Voir en temps réel tous les diagnostics, emails, pipeline</div>
-        <div style="padding:12px; background:var(--gray-50); border-radius:var(--radius-xs); font-size:13px;">✅ Valider chaque diagnostic avant envoi</div>
-        <div style="padding:12px; background:var(--gray-50); border-radius:var(--radius-xs); font-size:13px;">✅ KPIs de campagne (ouverture, clics, RDV, ROI)</div>
-        <div style="padding:12px; background:var(--gray-50); border-radius:var(--radius-xs); font-size:13px;">✅ Alertes Discord temps réel</div>
-      </div>
-    </div>
   </div>
-</div>
+</div></section>
 
-<!-- SECTION: PASSEPORTS -->
-<div class="section" id="passeports">
-  <div class="section-inner">
-    <div class="section-header">
-      <div class="tag green">05 — QUALIFICATION</div>
-      <h2>Les 2 passeports</h2>
-      <p>Système de qualification éprouvé chez Alvo, répliqué pour Kwantic</p>
-    </div>
+<!-- CTA -->
+<div class="cta"><div class="wrap">
+  <h2>Prêt à lancer la <span class="grad">machine</span> ?</h2>
+  <p class="muted">Prochaine étape : validation du brief par Benjamin &amp; Stéphane, puis audit stack (S1) et 1er scan Oracle.</p>
+  <a class="btn" href="mailto:aurelien@alvo.market?subject=POC%20Kwantic%20x%20Egery">Cadrer le lancement →</a>
+</div></div>
 
-    <div class="card-grid-2">
-      <div class="card" style="border-left: 4px solid var(--teal);">
-        <h3><span class="icon teal">📝</span> Passeport 1 — Formulaire en ligne</h3>
-        <p style="color:var(--teal); font-weight:600; margin-bottom:12px;">Self-service prospect</p>
-        <div style="display:flex; flex-direction:column; gap:10px;">
-          <div><strong style="font-size:12px; color:var(--gray-500);">OÙ</strong><br><span style="font-size:13px;">Landing pages, emails Brevo, cockpit d’audit</span></div>
-          <div><strong style="font-size:12px; color:var(--gray-500);">QUAND</strong><br><span style="font-size:13px;">Après consultation du cockpit — CTA "Réserver mon diagnostic"</span></div>
-          <div><strong style="font-size:12px; color:var(--gray-500);">CONTENU</strong><br><span style="font-size:13px;">Nom, société, email, téléphone, effectif, problématique, budget, urgence</span></div>
-          <div><strong style="font-size:12px; color:var(--gray-500);">NOTIFICATION</strong><br><span style="font-size:13px;">Discord instantanée + email Kwantic + Supabase + HubSpot deal auto</span></div>
-        </div>
-      </div>
-      <div class="card" style="border-left: 4px solid var(--purple);">
-        <h3><span class="icon purple">📞</span> Passeport 2 — Outil commercial</h3>
-        <p style="color:var(--purple); font-weight:600; margin-bottom:12px;">SDR / qualification approfondie</p>
-        <div style="display:flex; flex-direction:column; gap:10px;">
-          <div><strong style="font-size:12px; color:var(--gray-500);">OÙ</strong><br><span style="font-size:13px;">Interface dédiée pour le commercial/SDR</span></div>
-          <div><strong style="font-size:12px; color:var(--gray-500);">QUAND</strong><br><span style="font-size:13px;">Pendant un appel — le SDR remplit en temps réel</span></div>
-          <div><strong style="font-size:12px; color:var(--gray-500);">CONTENU</strong><br><span style="font-size:13px;">Tout le Passeport 1 + stack actuelle, intégrations, historique, douleurs, timeline</span></div>
-          <div><strong style="font-size:12px; color:var(--gray-500);">BOUTON ENRICHIR</strong><br><span style="font-size:13px;">Appel API auto (Pappers + Apollo) → fiche complète en temps réel</span></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- SECTION: SYNERGIES -->
-<div class="section" id="synergies">
-  <div class="section-inner">
-    <div class="section-header">
-      <div class="tag purple">06 — SYNERGIES</div>
-      <h2>Modèle commercial Alvo × Kwantic</h2>
-      <p>Échange de services + commissions sur deals closés</p>
-    </div>
-
-    <div class="card-grid-2" style="margin-bottom:24px;">
-      <div class="card" style="border-top: 4px solid var(--purple);">
-        <h3 style="color:var(--purple);">EGERY → KWANTIC</h3>
-        <p>Mission Growth/CRO externalisée complète : Oracle Kwantic, tunnel d’acquisition, campagnes Brevo + Droper, agents IA, cockpit prospect, qualification leads, production pré-diagnostics, reporting hebdo</p>
-      </div>
-      <div class="card" style="border-top: 4px solid var(--teal);">
-        <h3 style="color:var(--teal);">KWANTIC → ALVO</h3>
-        <p>Product Management externalisé pour Alvo : gestion roadmap tech, coordination développements, sprints, mise en production, UX/UI, QA — prestations Kwantic au standard commercial</p>
-      </div>
-    </div>
-
-    <table class="data-table">
-      <thead><tr>
-        <th>Source du lead</th><th>Marque</th><th>Commission Egery</th><th>Logique</th>
-      </tr></thead>
-      <tbody>
-        <tr><td class="bold">Oracle Kwantic / site kwantic.fr</td><td class="teal-text">100% Kwantic</td><td>10% setup + 10% MRR (12 mois)</td><td>Lead généré par l’écosystème Egery</td></tr>
-        <tr><td class="bold">Cross-sell Alvo (repreneur, cédant)</td><td class="purple-text">Egery Tech × Kwantic</td><td>15% setup + 15% MRR (12 mois)</td><td>Lead apporté par Alvo, co-brandé</td></tr>
-        <tr><td class="bold">Client Kwantic existant</td><td class="teal-text">100% Kwantic</td><td class="green-text">0%</td><td>Relation préexistante</td></tr>
-        <tr><td class="bold">Référence agent Alvo</td><td class="teal-text">Kwantic</td><td>10% du setup</td><td>Commission apporteur classique</td></tr>
-      </tbody>
-    </table>
-
-    <div class="card" style="margin-top:16px; background: linear-gradient(135deg, var(--purple-bg), var(--teal-bg));">
-      <h3>💡 Qui paie quoi — Zéro cash flow</h3>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:12px;">
-        <div>
-          <div style="font-weight:700; color:var(--teal); font-size:14px; margin-bottom:8px;">KWANTIC PAIE</div>
-          <p style="font-size:13px;">✅ 100% des coûts outils (~450-550€/mois : Brevo, Apollo, Droper, Pappers, Supabase, Vercel, Claude)</p>
-        </div>
-        <div>
-          <div style="font-weight:700; color:var(--purple); font-size:14px; margin-bottom:8px;">EGERY PAIE</div>
-          <p style="font-size:13px;">✅ Temps CRO/Growth (Aurélien + Claude) — gratuit via échange de services</p>
-        </div>
-      </div>
-      <div style="text-align:center; margin-top:16px; padding:12px; background:rgba(16,185,129,0.1); border-radius:var(--radius-xs);">
-        <span style="font-size:24px; font-weight:800; color:var(--green);">0€</span>
-        <span style="font-size:13px; color:var(--gray-600); margin-left:8px;">cash flow échangé entre les deux entités</span>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- SECTION: PREVISIONNEL -->
-<div class="section" id="previsionnel">
-  <div class="section-inner">
-    <div class="section-header">
-      <div class="tag purple">07 — PRÉVISIONNEL</div>
-      <h2>Projection 6 mois — funnel complet & double ligne de revenus</h2>
-      <p>Scénario conservateur mais réaliste — vision Head of Growth avec avantage base prospects Alvo</p>
-    </div>
-
-    <!-- KPI TILES -->
-    <div class="kpi-grid" style="grid-template-columns: repeat(4, 1fr);">
-      <div class="kpi"><div class="val purple">128,6K€</div><div class="desc">CA Total 6 mois</div></div>
-      <div class="kpi"><div class="val teal">48,5K€</div><div class="desc">L1 Setup + MRR</div></div>
-      <div class="kpi"><div class="val green">80K€</div><div class="desc">L2 Gros projet</div></div>
-      <div class="kpi"><div class="val orange">12 855€</div><div class="desc">Commission Egery</div></div>
-    </div>
-    <div class="kpi-grid" style="grid-template-columns: repeat(4, 1fr); margin-top: 0;">
-      <div class="kpi"><div class="val" style="color:var(--gray-900);">430</div><div class="desc">Leads sourcés 6 mois</div></div>
-      <div class="kpi"><div class="val" style="color:var(--gray-900);">25</div><div class="desc">RDV qualifiés</div></div>
-      <div class="kpi"><div class="val teal">4 200€</div><div class="desc">MRR à M6</div></div>
-      <div class="kpi"><div class="val green">0€</div><div class="desc">Coût pour Egery</div></div>
-    </div>
-
-    <!-- AVANTAGE ALVO -->
-    <div class="card" style="border-left:4px solid var(--green); margin-bottom:24px; background:var(--green-bg);">
-      <h3><span class="icon green">⚡</span> Avantage structurel : base prospects Alvo existante</h3>
-      <p style="color:var(--gray-700);">Contrairement à un cold start classique, <strong>Alvo dispose déjà d’une base qualifiée de prospects PME/ETI</strong> (cédants, repreneurs, dirigeants). Ces contacts sont déjà sensibilisés à la transformation digitale et au conseil stratégique. Résultat : <strong>des leads et des RDV qualifiés dès M2</strong>, pas besoin d’attendre M3-M4 pour remplir le pipe. Le cycle d’acquisition est raccourci d’au moins 1 mois vs un démarrage from scratch.</p>
-    </div>
-
-    <!-- L1 / L2 CARDS -->
-    <div class="card-grid-2" style="margin-bottom:24px;">
-      <div class="card" style="border-left:4px solid var(--purple);">
-        <h3>Ligne 1 — Setup + MRR</h3>
-        <p><strong>Setup rapide (1-4 sem.)</strong> + accompagnement mensuel CTO/AI Officer externalisé</p>
-        <div style="margin-top:12px; font-size:13px;">
-          <div>Panier moyen : <strong>5-30K€ setup</strong> + <strong>1 500-5 000€/mois MRR</strong></div>
-          <div>Volume cible : 1-2 projets/mois (conservateur)</div>
-          <div>Cycle de vente : 1-3 semaines</div>
-        </div>
-      </div>
-      <div class="card" style="border-left:4px solid var(--teal);">
-        <h3>Ligne 2 — Gros projets</h3>
-        <p><strong>ERP Odoo/SAP, CRM, e-commerce B2B, apps métier, migration SI</strong></p>
-        <div style="margin-top:12px; font-size:13px;">
-          <div>Panier moyen : <strong>80K€ à 120K€+</strong></div>
-          <div>Volume : 1 gros projet tous les 2-3 mois</div>
-          <div>Le tunnel Growth L1 est la porte d’entrée</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- FUNNEL COMPLET -->
-    <div class="chart-card" style="margin-bottom:24px;">
-      <h3>🔄 Funnel de conversion complet — ligne par ligne</h3>
-      <p style="font-size:13px; color:var(--gray-500); margin-bottom:20px;">
-        Chaque étape du tunnel avec taux de conversion conservateurs. Leads dès M2 grâce à la base Alvo + Oracle.
-      </p>
-      <table class="data-table" style="margin-bottom:0;">
-        <thead><tr>
-          <th style="min-width:200px;">Étape funnel</th>
-          <th style="text-align:center;">Taux</th>
-          <th style="text-align:center;">M1</th>
-          <th style="text-align:center;">M2</th>
-          <th style="text-align:center;">M3</th>
-          <th style="text-align:center;">M4</th>
-          <th style="text-align:center;">M5</th>
-          <th style="text-align:center;">M6</th>
-          <th class="purple" style="text-align:center;">TOTAL</th>
-        </tr></thead>
-        <tbody>
-          <tr>
-            <td class="bold">🎯 Leads sourcés</td>
-            <td style="text-align:center; color:var(--gray-400); font-size:12px;">—</td>
-            <td style="text-align:center;">0</td>
-            <td style="text-align:center;">30</td>
-            <td style="text-align:center;">60</td>
-            <td style="text-align:center;">100</td>
-            <td style="text-align:center;">120</td>
-            <td style="text-align:center;">120</td>
-            <td style="text-align:center;" class="bold">430</td>
-          </tr>
-          <tr style="font-size:12px; color:var(--gray-400);">
-            <td style="padding-left:28px;">↳ dont base Alvo existante</td>
-            <td style="text-align:center;">—</td>
-            <td style="text-align:center;">—</td>
-            <td style="text-align:center;">15</td>
-            <td style="text-align:center;">20</td>
-            <td style="text-align:center;">15</td>
-            <td style="text-align:center;">10</td>
-            <td style="text-align:center;">10</td>
-            <td style="text-align:center;">70</td>
-          </tr>
-          <tr style="font-size:12px; color:var(--gray-400);">
-            <td style="padding-left:28px;">↳ dont Oracle + outbound</td>
-            <td style="text-align:center;">—</td>
-            <td style="text-align:center;">—</td>
-            <td style="text-align:center;">15</td>
-            <td style="text-align:center;">40</td>
-            <td style="text-align:center;">85</td>
-            <td style="text-align:center;">110</td>
-            <td style="text-align:center;">110</td>
-            <td style="text-align:center;">360</td>
-          </tr>
-          <tr>
-            <td class="bold">📧 Leads contactés / répondus</td>
-            <td style="text-align:center;" class="teal-text">30%</td>
-            <td style="text-align:center;">0</td>
-            <td style="text-align:center;">9</td>
-            <td style="text-align:center;">18</td>
-            <td style="text-align:center;">30</td>
-            <td style="text-align:center;">36</td>
-            <td style="text-align:center;">36</td>
-            <td style="text-align:center;" class="bold">129</td>
-          </tr>
-          <tr>
-            <td class="bold">📞 RDV qualifiés posés</td>
-            <td style="text-align:center;" class="teal-text">25%</td>
-            <td style="text-align:center;">0</td>
-            <td style="text-align:center;">2</td>
-            <td style="text-align:center;">5</td>
-            <td style="text-align:center;">8</td>
-            <td style="text-align:center;">9</td>
-            <td style="text-align:center;">9</td>
-            <td style="text-align:center;" class="bold">33</td>
-          </tr>
-          <tr>
-            <td class="bold">✅ RDV réalisés</td>
-            <td style="text-align:center;" class="teal-text">75%</td>
-            <td style="text-align:center;">0</td>
-            <td style="text-align:center;">2</td>
-            <td style="text-align:center;">4</td>
-            <td style="text-align:center;">6</td>
-            <td style="text-align:center;">7</td>
-            <td style="text-align:center;">7</td>
-            <td style="text-align:center;" class="bold">26</td>
-          </tr>
-          <tr>
-            <td class="bold">📄 Propositions envoyées</td>
-            <td style="text-align:center;" class="teal-text">60%</td>
-            <td style="text-align:center;">0</td>
-            <td style="text-align:center;">1</td>
-            <td style="text-align:center;">2</td>
-            <td style="text-align:center;">4</td>
-            <td style="text-align:center;">4</td>
-            <td style="text-align:center;">4</td>
-            <td style="text-align:center;" class="bold">15</td>
-          </tr>
-          <tr style="background:var(--purple-bg);">
-            <td class="bold purple-text">🤝 Signatures L1</td>
-            <td style="text-align:center;" class="purple-text">30%</td>
-            <td style="text-align:center;">0</td>
-            <td style="text-align:center;">0</td>
-            <td style="text-align:center;">1</td>
-            <td style="text-align:center;">1</td>
-            <td style="text-align:center;">1</td>
-            <td style="text-align:center;">1</td>
-            <td style="text-align:center;" class="bold purple-text">4</td>
-          </tr>
-          <tr style="background:var(--green-bg);">
-            <td class="bold green-text">🚀 Upsell L2 (depuis L1)</td>
-            <td style="text-align:center;" class="green-text">15%</td>
-            <td style="text-align:center;">0</td>
-            <td style="text-align:center;">0</td>
-            <td style="text-align:center;">0</td>
-            <td style="text-align:center;">0</td>
-            <td style="text-align:center;">0</td>
-            <td style="text-align:center;">1</td>
-            <td style="text-align:center;" class="bold green-text">1</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- FUNNEL CONVERSION RATES VISUAL -->
-    <div class="flow" style="margin-bottom:24px;">
-      <div class="flow-step">
-        <div class="num" style="background:var(--gray-700);">1</div>
-        <h4>430 leads</h4>
-        <p>Oracle + Alvo base + outbound Brevo/Droper</p>
-      </div>
-      <div class="flow-step">
-        <div class="num" style="background:var(--teal);">2</div>
-        <h4>129 répondus</h4>
-        <p>30% taux de réponse (warm leads Alvo = boost)</p>
-      </div>
-      <div class="flow-step">
-        <div class="num" style="background:var(--teal);">3</div>
-        <h4>33 RDV</h4>
-        <p>25% booking rate (qualif passeport)</p>
-      </div>
-      <div class="flow-step">
-        <div class="num" style="background:var(--purple);">4</div>
-        <h4>15 propositions</h4>
-        <p>60% des RDV réalisés convertis en propale</p>
-      </div>
-      <div class="flow-step">
-        <div class="num" style="background:var(--purple);">5</div>
-        <h4>4 signatures L1</h4>
-        <p>30% closing rate → 10K€ setup moyen</p>
-      </div>
-    </div>
-
-    <!-- CHART -->
-    <div class="chart-card">
-      <h3>📊 Revenus mensuels — scénario conservateur</h3>
-      <canvas id="revenueChart" height="300"></canvas>
-    </div>
-
-    <!-- REVENUE TABLE -->
-    <div class="chart-card" style="padding:0; overflow:hidden;">
-      <h3 style="padding:20px 20px 0; margin-bottom:0;">💰 Détail revenus mois par mois</h3>
-      <table class="data-table" style="margin:0; border:none; border-radius:0;">
-        <thead><tr>
-          <th style="min-width:200px;"></th>
-          <th style="text-align:center;">M1</th>
-          <th style="text-align:center;">M2</th>
-          <th style="text-align:center;">M3</th>
-          <th style="text-align:center;">M4</th>
-          <th style="text-align:center;">M5</th>
-          <th style="text-align:center;">M6</th>
-          <th class="purple" style="text-align:center;">TOTAL</th>
-        </tr></thead>
-        <tbody>
-          <tr><td class="bold" style="color:var(--gray-400); font-size:12px; text-transform:uppercase; letter-spacing:0.5px;" colspan="8">Activité commerciale</td></tr>
-          <tr>
-            <td class="bold">Leads sourcés</td>
-            <td style="text-align:center;">0</td>
-            <td style="text-align:center;">30</td>
-            <td style="text-align:center;">60</td>
-            <td style="text-align:center;">100</td>
-            <td style="text-align:center;">120</td>
-            <td style="text-align:center;">120</td>
-            <td style="text-align:center;" class="bold">430</td>
-          </tr>
-          <tr>
-            <td class="bold">RDV qualifiés</td>
-            <td style="text-align:center;">0</td>
-            <td style="text-align:center;">2</td>
-            <td style="text-align:center;">5</td>
-            <td style="text-align:center;">8</td>
-            <td style="text-align:center;">9</td>
-            <td style="text-align:center;">9</td>
-            <td style="text-align:center;" class="bold">33</td>
-          </tr>
-          <tr>
-            <td class="bold">Propositions envoyées</td>
-            <td style="text-align:center;">0</td>
-            <td style="text-align:center;">1</td>
-            <td style="text-align:center;">2</td>
-            <td style="text-align:center;">4</td>
-            <td style="text-align:center;">4</td>
-            <td style="text-align:center;">4</td>
-            <td style="text-align:center;" class="bold">15</td>
-          </tr>
-
-          <tr><td class="bold" style="color:var(--purple); font-size:12px; text-transform:uppercase; letter-spacing:0.5px;" colspan="8">Ligne 1 — Setup + MRR</td></tr>
-          <tr>
-            <td class="bold">Signatures L1</td>
-            <td style="text-align:center;">0</td>
-            <td style="text-align:center;">0</td>
-            <td style="text-align:center;">1</td>
-            <td style="text-align:center;">1</td>
-            <td style="text-align:center;">1</td>
-            <td style="text-align:center;">1</td>
-            <td style="text-align:center;" class="bold">4</td>
-          </tr>
-          <tr>
-            <td class="bold purple-text">CA Setup (one-shot)</td>
-            <td style="text-align:center;">—</td>
-            <td style="text-align:center;">—</td>
-            <td style="text-align:center;" class="purple-text">10 000€</td>
-            <td style="text-align:center;" class="purple-text">10 000€</td>
-            <td style="text-align:center;" class="purple-text">10 000€</td>
-            <td style="text-align:center;" class="purple-text">10 000€</td>
-            <td style="text-align:center;" class="bold purple-text">40 000€</td>
-          </tr>
-          <tr>
-            <td class="bold">Clients actifs MRR (cumulé)</td>
-            <td style="text-align:center;">0</td>
-            <td style="text-align:center;">0</td>
-            <td style="text-align:center;">0</td>
-            <td style="text-align:center;">1</td>
-            <td style="text-align:center;">2</td>
-            <td style="text-align:center;">3</td>
-            <td style="text-align:center;" class="bold">—</td>
-          </tr>
-          <tr>
-            <td class="bold teal-text">MRR mensuel</td>
-            <td style="text-align:center;">—</td>
-            <td style="text-align:center;">—</td>
-            <td style="text-align:center;">—</td>
-            <td style="text-align:center;" class="teal-text">1 500€</td>
-            <td style="text-align:center;" class="teal-text">2 850€</td>
-            <td style="text-align:center;" class="teal-text">4 200€</td>
-            <td style="text-align:center;" class="bold teal-text">8 550€</td>
-          </tr>
-
-          <tr><td class="bold" style="color:var(--green); font-size:12px; text-transform:uppercase; letter-spacing:0.5px;" colspan="8">Ligne 2 — Gros projets</td></tr>
-          <tr>
-            <td class="bold">Projets L2 signés</td>
-            <td style="text-align:center;">0</td>
-            <td style="text-align:center;">0</td>
-            <td style="text-align:center;">0</td>
-            <td style="text-align:center;">0</td>
-            <td style="text-align:center;">0</td>
-            <td style="text-align:center;">1</td>
-            <td style="text-align:center;" class="bold">1</td>
-          </tr>
-          <tr>
-            <td class="bold green-text">CA Gros projet</td>
-            <td style="text-align:center;">—</td>
-            <td style="text-align:center;">—</td>
-            <td style="text-align:center;">—</td>
-            <td style="text-align:center;">—</td>
-            <td style="text-align:center;">—</td>
-            <td style="text-align:center;" class="green-text">80 000€</td>
-            <td style="text-align:center;" class="bold green-text">80 000€</td>
-          </tr>
-
-          <tr><td colspan="8" style="padding:0; border-bottom: 2px solid var(--purple);"></td></tr>
-          <tr class="highlight-row">
-            <td class="bold" style="font-size:15px;">CA TOTAL</td>
-            <td style="text-align:center;">—</td>
-            <td style="text-align:center;">—</td>
-            <td style="text-align:center;" class="bold">10 000€</td>
-            <td style="text-align:center;" class="bold">11 500€</td>
-            <td style="text-align:center;" class="bold">12 850€</td>
-            <td style="text-align:center;" class="bold">94 200€</td>
-            <td style="text-align:center;" class="bold purple-text" style="font-size:16px;">128 550€</td>
-          </tr>
-          <tr class="total-row">
-            <td class="bold">Commission Egery (10%)</td>
-            <td style="text-align:center;">—</td>
-            <td style="text-align:center;">—</td>
-            <td style="text-align:center;">1 000€</td>
-            <td style="text-align:center;">1 150€</td>
-            <td style="text-align:center;">1 285€</td>
-            <td style="text-align:center;">9 420€</td>
-            <td style="text-align:center;" class="bold purple-text">12 855€</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- HYPOTHESES -->
-    <div class="card-grid-2" style="margin-top:24px;">
-      <div class="chart-card" style="margin-bottom:0;">
-        <h3>📐 Hypothèses de conversion</h3>
-        <table class="data-table" style="margin:0; border:none;">
-          <tbody>
-            <tr><td class="bold">Lead → Répondu</td><td style="text-align:right;" class="teal-text">30%</td></tr>
-            <tr><td class="bold">Répondu → RDV qualifié</td><td style="text-align:right;" class="teal-text">25%</td></tr>
-            <tr><td class="bold">RDV posé → RDV réalisé</td><td style="text-align:right;" class="teal-text">75%</td></tr>
-            <tr><td class="bold">RDV réalisé → Proposition</td><td style="text-align:right;" class="teal-text">60%</td></tr>
-            <tr><td class="bold">Proposition → Signature L1</td><td style="text-align:right;" class="purple-text">30%</td></tr>
-            <tr><td class="bold">Client L1 → Upsell L2</td><td style="text-align:right;" class="green-text">15%</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="chart-card" style="margin-bottom:0;">
-        <h3>💶 Hypothèses de pricing</h3>
-        <table class="data-table" style="margin:0; border:none;">
-          <tbody>
-            <tr><td class="bold">Panier setup moyen L1</td><td style="text-align:right;">10 000€</td></tr>
-            <tr><td class="bold">MRR moyen par client</td><td style="text-align:right;">1 500€/mois</td></tr>
-            <tr><td class="bold">Churn MRR mensuel</td><td style="text-align:right;">5%</td></tr>
-            <tr><td class="bold">Panier moyen L2</td><td style="text-align:right;">80 000€</td></tr>
-            <tr><td class="bold">Commission Egery Oracle</td><td style="text-align:right;">10%</td></tr>
-            <tr><td class="bold">Commission Egery cross-sell</td><td style="text-align:right;">15%</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- NOTE CONSERVATEUR -->
-    <div class="card" style="border-left:4px solid var(--orange); margin-top:24px;">
-      <h3><span class="icon orange">⚠️</span> Pourquoi ce scénario reste conservateur</h3>
-      <div style="font-size:13px; color:var(--gray-600); line-height:1.8;">
-        <div><strong>1.</strong> Les leads Oracle + outbound ne démarrent qu’à M2 alors que la base Alvo est activable immédiatement</div>
-        <div><strong>2.</strong> Le taux de réponse à 30% est bas pour des contacts warm (Alvo = déjà en relation)</div>
-        <div><strong>3.</strong> Le closing rate à 30% sur proposition est prudent pour un service à cycle court (1-3 semaines)</div>
-        <div><strong>4.</strong> Un seul gros projet L2 sur 6 mois alors que le pipe générera naturellement des besoins ERP/CRM</div>
-        <div><strong>5.</strong> Pas de prise en compte du bouche-à-oreille, des recommandations clients, ni de l’inbound organique</div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- SECTION: PLANNING -->
-<div class="section" id="planning">
-  <div class="section-inner">
-    <div class="section-header">
-      <div class="tag orange">08 — RÉTROPLANNING</div>
-      <h2>Mission Growth/CRO externalisé</h2>
-      <p>De l’audit à l’échelle en 6 semaines</p>
-    </div>
-
-    <div class="timeline">
-      <div class="timeline-item">
-        <div class="dot"></div>
-        <div class="timing">S1 — AUDIT</div>
-        <h4>Audit stack Kwantic</h4>
-        <p>CRM, emailing, téléphonie, comm interne, gestion projet. Cartographie outils. Décisions d’architecture. Livrables : rapport d’audit, matrice outils, plan technique.</p>
-      </div>
-      <div class="timeline-item">
-        <div class="dot" style="border-color:var(--teal);"></div>
-        <div class="timing" style="color:var(--teal);">S1-S2 — SETUP</div>
-        <h4>Configuration outils</h4>
-        <p>Config Brevo (domaine, templates, listes). Config Apollo/Pappers. Supabase tables Kwantic. Webhooks Discord. Livrables : comptes actifs, templates validés, notifications opérationnelles.</p>
-      </div>
-      <div class="timeline-item">
-        <div class="dot" style="border-color:var(--purple);"></div>
-        <div class="timing">S2-S3 — BUILD</div>
-        <h4>Développement agents & passeports</h4>
-        <p>Oracle Kwantic (skill Claude + cron). Scripts audit auto Lighthouse/Wappalyzer/PageSpeed. Passeport 1 + Passeport 2. Premier scan marché (50 cibles).</p>
-      </div>
-      <div class="timeline-item">
-        <div class="dot" style="border-color:var(--green);"></div>
-        <div class="timing" style="color:var(--green);">S3-S4 — COCKPIT</div>
-        <h4>Développement cockpits</h4>
-        <p>Cockpit prospect (React/Supabase/Vercel). Dashboard interne Kwantic. Intégration domaines temporaires. Workflows de validation.</p>
-      </div>
-      <div class="timeline-item">
-        <div class="dot" style="border-color:var(--orange);"></div>
-        <div class="timing" style="color:var(--orange);">S4-S5 — PILOT</div>
-        <h4>Campagne pilote 50 prospects</h4>
-        <p>Calibrage messages Brevo + Droper. Mesure taux. Itération copywriting. Formation SDR sur Passeport 2. KPIs de conversion. Templates validés.</p>
-      </div>
-      <div class="timeline-item">
-        <div class="dot" style="border-color:var(--green); background:var(--green);"></div>
-        <div class="timing" style="color:var(--green);">S6+ — SCALE</div>
-        <h4>Scale à 80-200 leads/mois</h4>
-        <p>Intégration cross-sell Alvo. Reporting hebdo dans cockpit Kwantic. Premiers projets signés. MRR en construction. Itération continue.</p>
-      </div>
-    </div>
-
-    <div class="card" style="margin-top:32px;">
-      <h3><span class="icon dark">📋</span> Prochaines étapes</h3>
-      <div style="display:flex; flex-direction:column; gap:10px; margin-top:12px;">
-        <div style="display:flex; align-items:center; gap:12px; padding:10px; background:var(--gray-50); border-radius:var(--radius-xs);">
-          <span style="width:28px; height:28px; background:var(--purple); color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; flex-shrink:0;">1</span>
-          <span style="font-size:13px;">Validation de ce brief par Kwantic (Benjamin + Stéphane)</span>
-        </div>
-        <div style="display:flex; align-items:center; gap:12px; padding:10px; background:var(--gray-50); border-radius:var(--radius-xs);">
-          <span style="width:28px; height:28px; background:var(--purple); color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; flex-shrink:0;">2</span>
-          <span style="font-size:13px;">Audit stack Kwantic (S1) — cartographie outils, accès API</span>
-        </div>
-        <div style="display:flex; align-items:center; gap:12px; padding:10px; background:var(--gray-50); border-radius:var(--radius-xs);">
-          <span style="width:28px; height:28px; background:var(--purple); color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; flex-shrink:0;">3</span>
-          <span style="font-size:13px;">Secteurs cibles prioritaires + positionnement cockpit</span>
-        </div>
-        <div style="display:flex; align-items:center; gap:12px; padding:10px; background:var(--gray-50); border-radius:var(--radius-xs);">
-          <span style="width:28px; height:28px; background:var(--teal); color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; flex-shrink:0;">4</span>
-          <span style="font-size:13px;">Setup Brevo + Droper.ai + Apollo + Discord (S1-S2)</span>
-        </div>
-        <div style="display:flex; align-items:center; gap:12px; padding:10px; background:var(--gray-50); border-radius:var(--radius-xs);">
-          <span style="width:28px; height:28px; background:var(--teal); color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; flex-shrink:0;">5</span>
-          <span style="font-size:13px;">Développement Oracle + cockpits + passeports (S2-S4)</span>
-        </div>
-        <div style="display:flex; align-items:center; gap:12px; padding:10px; background:var(--gray-50); border-radius:var(--radius-xs);">
-          <span style="width:28px; height:28px; background:var(--orange); color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; flex-shrink:0;">6</span>
-          <span style="font-size:13px;">Campagne pilote 50 prospects + calibrage (S4-S5)</span>
-        </div>
-        <div style="display:flex; align-items:center; gap:12px; padding:10px; background:var(--gray-50); border-radius:var(--radius-xs);">
-          <span style="width:28px; height:28px; background:var(--green); color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; flex-shrink:0;">7</span>
-          <span style="font-size:13px;">Revue M3 — premier bilan quantitatif, décision de scale</span>
-        </div>
-      </div>
-    </div>
-
-    <div style="text-align:center; margin-top:48px; padding:24px; color:var(--gray-400); font-size:13px; border-top: 1px solid var(--gray-200);">
-      Document préparé par Aurélien Queroy — Groupe Egery<br>
-      <span style="font-size:11px;">Confidentiel — Ne pas diffuser sans autorisation</span>
-    </div>
-  </div>
-</div>
-
-<!-- SECTION: PRÉ-DIAGNOSTIC FINANCIER -->
-<div class="section" id="prediag">
-  <div class="section-inner">
-    <div class="section-header">
-      <div class="tag orange">09 — PRÉ-DIAGNOSTIC</div>
-      <h2>Analyse financière Kwantic</h2>
-      <p>Données certifiées Pappers API — Structure capitalistique, dépôts légaux, actionnariat et signaux. Score Business/Financier : <strong style="color:var(--orange);">55/100</strong></p>
-    </div>
-
-    <!-- ALERTE PRINCIPALE -->
-    <div class="card" style="border-left:4px solid var(--orange); background:var(--orange-bg);">
-      <h3><span class="icon" style="background:var(--orange-bg); color:var(--orange);">⚠️</span> Opacité financière — 7 exercices sous confidentialité</h3>
-      <p style="color:var(--gray-600); font-size:14px; line-height:1.7;">De 2019 à 2025, <strong>chaque exercice comptable</strong> a été déposé sous clause de confidentialité (art. L.232-25, 1er ou 2e alinéa). Aucun chiffre d’affaires, résultat net ou bilan n’est accessible publiquement. Cette opacité systématique, combinée aux écarts entre données publiques (INSEE : 3-5 salariés) et déclarations commerciales (~35 collaborateurs), réduit significativement le score de confiance financière.</p>
-    </div>
-
-    <div class="card-grid-2" style="margin-top:16px;">
-
-      <!-- STRUCTURE CAPITALISTIQUE -->
-      <div class="card">
-        <h3><span class="icon purple">🏛️</span> Structure capitalistique</h3>
-        <div style="display:flex; flex-direction:column; gap:10px; font-size:14px;">
-          <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--gray-100);">
-            <span style="color:var(--gray-500);">Capital actuel</span>
-            <span style="font-weight:600; color:var(--green);">20 000 € <span style="background:var(--green-bg); color:var(--green); padding:2px 8px; border-radius:99px; font-size:11px; font-weight:600;">AGE Oct. 2022</span></span>
-          </div>
-          <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--gray-100);">
-            <span style="color:var(--gray-500);">Capital à la création</span>
-            <span style="font-weight:600;">500 € (14/02/2018)</span>
-          </div>
-          <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--gray-100);">
-            <span style="color:var(--gray-500);">Holding présidente</span>
-            <span style="font-weight:600;">WATTZ OFFICE (SAS)</span>
-          </div>
-          <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--gray-100);">
-            <span style="color:var(--gray-500);">Bénéficiaire effectif 1</span>
-            <span style="font-weight:600;">Stéphane Catherine <span style="color:var(--gray-400); font-weight:400;">— Président, 39 ans</span></span>
-          </div>
-          <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--gray-100);">
-            <span style="color:var(--gray-500);">Bénéficiaire effectif 2</span>
-            <span style="font-weight:600;">Benjamin Queroy <span style="color:var(--gray-400); font-weight:400;">— DG, 35 ans</span></span>
-          </div>
-          <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--gray-100);">
-            <span style="color:var(--gray-500);">Effectif INSEE</span>
-            <span><span style="background:var(--orange-bg); color:var(--orange); padding:2px 8px; border-radius:99px; font-size:11px; font-weight:600;">3 à 5 salariés</span> <span style="color:var(--gray-400); font-size:11px;">(2023)</span></span>
-          </div>
-          <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--gray-100);">
-            <span style="color:var(--gray-500);">Effectif revendiqué</span>
-            <span><span style="background:var(--red-bg); color:#EF4444; padding:2px 8px; border-radius:99px; font-size:11px; font-weight:600;">~35 collaborateurs</span></span>
-          </div>
-          <div style="display:flex; justify-content:space-between; padding:8px 0;">
-            <span style="color:var(--gray-500);">Convention collective</span>
-            <span style="font-weight:600;">SYNTEC — IDCC 1486</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- ESTIMATION CA -->
-      <div class="card" style="border:1px solid rgba(249,115,22,0.3);">
-        <h3><span class="icon" style="background:var(--orange-bg); color:var(--orange);">💰</span> Estimation CA — Méthode indirecte</h3>
-        <div style="text-align:center; padding:24px 0;">
-          <div style="font-size:36px; font-weight:800; color:var(--orange);">800K — 1,8M €</div>
-          <div style="font-size:12px; color:var(--gray-400); margin-top:6px;">Estimation annuelle — non vérifiable (comptes confidentiels)</div>
-        </div>
-        <div style="display:flex; flex-direction:column; gap:12px; margin-top:12px; padding-top:16px; border-top:1px solid var(--gray-200); font-size:13px; color:var(--gray-600); line-height:1.7;">
-          <div><strong style="color:var(--gray-800);">Hypothèse basse (800K€) :</strong> 5 salariés FR × 80K€/ETP + 15 devs nearshore × 15K€/an = 625K€ masse salariale, ratio CA/MS de 1.3×</div>
-          <div><strong style="color:var(--gray-800);">Hypothèse haute (1.8M€) :</strong> 5 salariés FR × 120K€/ETP + marge nearshore optimisée + 100+ clients actifs × panier moyen 12-18K€/an</div>
-          <div style="background:var(--orange-bg); padding:10px 14px; border-radius:var(--radius-xs); border-left:3px solid var(--orange);"><strong style="color:var(--orange);">Contrainte Pappers :</strong> Confidentialité L.232-25 = CA probablement < 700K€ en 2021. Croissance possible depuis, mais la borne basse est plus réaliste.</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- DÉPÔTS COMPTES + SIGNAUX -->
-    <div class="card-grid-2" style="margin-top:16px;">
-
-      <!-- HISTORIQUE DÉPÔTS -->
-      <div class="card">
-        <h3><span class="icon" style="background:var(--orange-bg); color:var(--orange);">📊</span> Historique dépôts comptes — BODACC</h3>
-        <div style="display:flex; flex-direction:column; gap:6px;">
-          <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 12px; background:var(--orange-bg); border-radius:var(--radius-xs); border:1px solid rgba(249,115,22,0.15);">
-            <span style="font-size:13px; font-weight:600;">Exercice 2025</span>
-            <span style="font-size:11px; color:var(--gray-400);">dépôt 17/05/2026</span>
-            <span style="background:rgba(249,115,22,0.15); color:var(--orange); padding:2px 8px; border-radius:99px; font-size:10px; font-weight:600;">Confidentiel</span>
-          </div>
-          <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 12px; background:var(--orange-bg); border-radius:var(--radius-xs); border:1px solid rgba(249,115,22,0.15);">
-            <span style="font-size:13px; font-weight:600;">Exercice 2024</span>
-            <span style="font-size:11px; color:var(--gray-400);">dépôt 16/11/2025</span>
-            <span style="background:rgba(249,115,22,0.15); color:var(--orange); padding:2px 8px; border-radius:99px; font-size:10px; font-weight:600;">Confidentiel</span>
-          </div>
-          <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 12px; background:var(--orange-bg); border-radius:var(--radius-xs); border:1px solid rgba(249,115,22,0.15);">
-            <span style="font-size:13px; font-weight:600;">Exercice 2023</span>
-            <span style="font-size:11px; color:var(--gray-400);">dépôt 30/01/2025</span>
-            <span style="background:rgba(249,115,22,0.15); color:var(--orange); padding:2px 8px; border-radius:99px; font-size:10px; font-weight:600;">Confidentiel</span>
-          </div>
-          <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 12px; background:var(--orange-bg); border-radius:var(--radius-xs); border:1px solid rgba(249,115,22,0.15);">
-            <span style="font-size:13px; font-weight:600;">Exercice 2022</span>
-            <span style="font-size:11px; color:var(--gray-400);">dépôt 09/07/2024</span>
-            <span style="background:rgba(249,115,22,0.15); color:var(--orange); padding:2px 8px; border-radius:99px; font-size:10px; font-weight:600;">Confidentiel</span>
-          </div>
-          <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 12px; background:var(--orange-bg); border-radius:var(--radius-xs); border:1px solid rgba(249,115,22,0.15);">
-            <span style="font-size:13px; font-weight:600;">Exercice 2021</span>
-            <span style="font-size:11px; color:var(--gray-400);">dépôt 07/11/2022</span>
-            <span style="background:rgba(249,115,22,0.15); color:var(--orange); padding:2px 8px; border-radius:99px; font-size:10px; font-weight:600;">Confidentiel</span>
-          </div>
-          <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 12px; background:var(--orange-bg); border-radius:var(--radius-xs); border:1px solid rgba(249,115,22,0.15);">
-            <span style="font-size:13px; font-weight:600;">Exercice 2020</span>
-            <span style="font-size:11px; color:var(--gray-400);">dépôt 06/04/2022</span>
-            <span style="background:rgba(249,115,22,0.15); color:var(--orange); padding:2px 8px; border-radius:99px; font-size:10px; font-weight:600;">Confidentiel</span>
-          </div>
-          <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 12px; background:var(--orange-bg); border-radius:var(--radius-xs); border:1px solid rgba(249,115,22,0.15);">
-            <span style="font-size:13px; font-weight:600;">Exercice 2019</span>
-            <span style="font-size:11px; color:var(--gray-400);">dépôt 21/02/2022</span>
-            <span style="background:rgba(249,115,22,0.15); color:var(--orange); padding:2px 8px; border-radius:99px; font-size:10px; font-weight:600;">Confidentiel</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- SIGNAUX DE SANTÉ -->
-      <div class="card">
-        <h3><span class="icon green">✅</span> Signaux de santé — Pappers / BODACC</h3>
-        <div style="display:flex; flex-direction:column; gap:8px;">
-          <div style="display:flex; align-items:center; gap:10px; padding:8px 12px; background:var(--green-bg); border-radius:var(--radius-xs);"><span style="background:var(--green); color:#fff; padding:2px 8px; border-radius:99px; font-size:10px; font-weight:700;">OK</span><span style="font-size:13px;">0 procédure collective (RJ/LJ/Sauvegarde)</span></div>
-          <div style="display:flex; align-items:center; gap:10px; padding:8px 12px; background:var(--green-bg); border-radius:var(--radius-xs);"><span style="background:var(--green); color:#fff; padding:2px 8px; border-radius:99px; font-size:10px; font-weight:700;">OK</span><span style="font-size:13px;">0 contentieux détecté</span></div>
-          <div style="display:flex; align-items:center; gap:10px; padding:8px 12px; background:var(--green-bg); border-radius:var(--radius-xs);"><span style="background:var(--green); color:#fff; padding:2px 8px; border-radius:99px; font-size:10px; font-weight:700;">OK</span><span style="font-size:13px;">0 sanction administrative</span></div>
-          <div style="display:flex; align-items:center; gap:10px; padding:8px 12px; background:var(--green-bg); border-radius:var(--radius-xs);"><span style="background:var(--green); color:#fff; padding:2px 8px; border-radius:99px; font-size:10px; font-weight:700;">OK</span><span style="font-size:13px;">Marque INPI "KWANTIC" (2021-2031)</span></div>
-          <div style="display:flex; align-items:center; gap:10px; padding:8px 12px; background:var(--green-bg); border-radius:var(--radius-xs);"><span style="background:var(--green); color:#fff; padding:2px 8px; border-radius:99px; font-size:10px; font-weight:700;">OK</span><span style="font-size:13px;">Éligible CII (Crédit d’Impôt Innovation)</span></div>
-          <div style="display:flex; align-items:center; gap:10px; padding:8px 12px; background:var(--green-bg); border-radius:var(--radius-xs);"><span style="background:var(--green); color:#fff; padding:2px 8px; border-radius:99px; font-size:10px; font-weight:700;">OK</span><span style="font-size:13px;">Dépôts comptes réguliers depuis 2019</span></div>
-          <div style="display:flex; align-items:center; gap:10px; padding:8px 12px; background:var(--orange-bg); border-radius:var(--radius-xs);"><span style="background:var(--orange); color:#fff; padding:2px 8px; border-radius:99px; font-size:10px; font-weight:700;">⚠</span><span style="font-size:13px;">Étab. secondaire G. Bonnac fermé 09/2023</span></div>
-          <div style="display:flex; align-items:center; gap:10px; padding:8px 12px; background:var(--orange-bg); border-radius:var(--radius-xs);"><span style="background:var(--orange); color:#fff; padding:2px 8px; border-radius:99px; font-size:10px; font-weight:700;">⚠</span><span style="font-size:13px;">2 modifications statutaires récentes (07/2024 + 04/2026)</span></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- TIMELINE + SCORE SANTÉ -->
-    <div class="card-grid-2" style="margin-top:16px;">
-      <div class="card">
-        <h3><span class="icon" style="background:var(--purple-bg2); color:var(--purple);">📅</span> Timeline financière clé</h3>
-        <div class="timeline" style="padding-left:0;">
-          <div style="display:flex; gap:12px; padding:10px 0; border-bottom:1px solid var(--gray-100);">
-            <span style="font-size:12px; font-weight:700; color:var(--purple); white-space:nowrap; min-width:80px;">Juil. 2017</span>
-            <span style="font-size:13px; color:var(--gray-600);">Création holding WATTZ OFFICE (SAS) — Capital 1 000€</span>
-          </div>
-          <div style="display:flex; gap:12px; padding:10px 0; border-bottom:1px solid var(--gray-100);">
-            <span style="font-size:12px; font-weight:700; color:var(--teal); white-space:nowrap; min-width:80px;">Fév. 2018</span>
-            <span style="font-size:13px; color:var(--gray-600);">Création RAISE-UP BUSINESS (SAS) — Capital 500€ — Bordeaux</span>
-          </div>
-          <div style="display:flex; gap:12px; padding:10px 0; border-bottom:1px solid var(--gray-100);">
-            <span style="font-size:12px; font-weight:700; color:var(--green); white-space:nowrap; min-width:80px;">Jan. 2021</span>
-            <span style="font-size:13px; color:var(--gray-600);">Ouverture 2e établissement 74 rue G. Bonnac</span>
-          </div>
-          <div style="display:flex; gap:12px; padding:10px 0; border-bottom:1px solid var(--gray-100);">
-            <span style="font-size:12px; font-weight:700; color:var(--orange); white-space:nowrap; min-width:80px;">Juin 2021</span>
-            <span style="font-size:13px; color:var(--gray-600);">Dépôt marque INPI "KWANTIC DEVENEZ INOUBLIABLE K"</span>
-          </div>
-          <div style="display:flex; gap:12px; padding:10px 0; border-bottom:1px solid var(--gray-100);">
-            <span style="font-size:12px; font-weight:700; color:var(--green); white-space:nowrap; min-width:80px;">Oct. 2022</span>
-            <span style="font-size:13px; color:var(--gray-600);"><strong style="color:var(--green);">AGE : Augmentation capital 500€ → 20 000€</strong> — Signal de structuration</span>
-          </div>
-          <div style="display:flex; gap:12px; padding:10px 0; border-bottom:1px solid var(--gray-100);">
-            <span style="font-size:12px; font-weight:700; color:#EF4444; white-space:nowrap; min-width:80px;">Sept. 2023</span>
-            <span style="font-size:13px; color:var(--gray-600);">Fermeture 2e établissement — Consolidation siège</span>
-          </div>
-          <div style="display:flex; gap:12px; padding:10px 0; border-bottom:1px solid var(--gray-100);">
-            <span style="font-size:12px; font-weight:700; color:var(--purple-light); white-space:nowrap; min-width:80px;">Juil. 2024</span>
-            <span style="font-size:13px; color:var(--gray-600);">Modification statutaire — Re-désignation WATTZ OFFICE</span>
-          </div>
-          <div style="display:flex; gap:12px; padding:10px 0;">
-            <span style="font-size:12px; font-weight:700; color:var(--teal); white-space:nowrap; min-width:80px;">Mai 2026</span>
-            <span style="font-size:13px; color:var(--gray-600);">Dépôt comptes 2025 — Toujours sous confidentialité</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- SCORE SANTÉ FINANCIÈRE -->
-      <div class="card">
-        <h3><span class="icon" style="background:var(--orange-bg); color:var(--orange);">📈</span> Score santé financière</h3>
-        <div style="display:flex; flex-direction:column; gap:16px; margin-top:8px;">
-          <div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span style="font-size:13px; color:var(--gray-600);">Conformité légale</span><span style="font-size:13px; font-weight:700; color:var(--green);">100%</span></div>
-            <div style="background:var(--gray-100); border-radius:99px; height:8px; overflow:hidden;"><div style="background:var(--green); height:100%; width:100%; border-radius:99px;"></div></div>
-          </div>
-          <div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span style="font-size:13px; color:var(--gray-600);">Solvabilité apparente</span><span style="font-size:13px; font-weight:700; color:var(--green);">85%</span></div>
-            <div style="background:var(--gray-100); border-radius:99px; height:8px; overflow:hidden;"><div style="background:var(--green); height:100%; width:85%; border-radius:99px;"></div></div>
-          </div>
-          <div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span style="font-size:13px; color:var(--gray-600);">Transparence financière</span><span style="font-size:13px; font-weight:700; color:#EF4444;">15%</span></div>
-            <div style="background:var(--gray-100); border-radius:99px; height:8px; overflow:hidden;"><div style="background:#EF4444; height:100%; width:15%; border-radius:99px;"></div></div>
-          </div>
-          <div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span style="font-size:13px; color:var(--gray-600);">Cohérence effectif déclaré/réel</span><span style="font-size:13px; font-weight:700; color:#EF4444;">20%</span></div>
-            <div style="background:var(--gray-100); border-radius:99px; height:8px; overflow:hidden;"><div style="background:#EF4444; height:100%; width:20%; border-radius:99px;"></div></div>
-          </div>
-          <div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span style="font-size:13px; color:var(--gray-600);">Souveraineté numérique</span><span style="font-size:13px; font-weight:700; color:#EF4444;">25%</span></div>
-            <div style="background:var(--gray-100); border-radius:99px; height:8px; overflow:hidden;"><div style="background:#EF4444; height:100%; width:25%; border-radius:99px;"></div></div>
-          </div>
-        </div>
-        <div style="margin-top:16px; padding:10px 14px; background:var(--teal-bg); border-radius:var(--radius-xs); border-left:3px solid var(--teal); font-size:12px; color:var(--gray-500);">
-          <strong style="color:var(--teal);">Source :</strong> Pappers API (SIREN 838234441) + BODACC + INSEE Sirene + societe.com — Dernière MAJ RCS : 20/06/2026
-        </div>
-      </div>
-    </div>
-
-    <div style="text-align:center; margin-top:32px; padding:16px; color:var(--gray-400); font-size:12px;">
-      Données publiques enrichies par Pappers API • BODACC • INSEE Sirene<br>
-      <span style="font-size:11px;">Pré-diagnostic automatisé — Egery Intelligence</span>
-    </div>
-  </div>
-</div>
-
-<script>
-// MOBILE NAV TOGGLE
-const navToggle = document.getElementById('navToggle');
-const navLinks = document.getElementById('navLinks');
-navToggle.addEventListener('click', () => {
-  navLinks.classList.toggle('open');
-  navToggle.textContent = navLinks.classList.contains('open') ? '✕' : '☰';
-});
-
-// NAV
-document.querySelectorAll('.nav-link').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById(btn.dataset.section).classList.add('active');
-    // Close mobile menu on selection
-    navLinks.classList.remove('open');
-    navToggle.textContent = '☰';
-    window.scrollTo({ top: document.querySelector('.hero').offsetHeight, behavior: 'smooth' });
-  });
-});
-
-// CHART
-window.addEventListener('DOMContentLoaded', () => {
-  const ctx = document.getElementById('revenueChart');
-  if (!ctx) return;
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: ['M1\nAudit & Setup', 'M2\nPremiers leads', 'M3\n1ère signature', 'M4\nMontée en charge', 'M5\nCroisière', 'M6\nL2 + Scale'],
-      datasets: [
-        { label: 'L1 — Setup (one-shot)', data: [0, 0, 10000, 10000, 10000, 10000], backgroundColor: '#6936EC', borderRadius: 6, borderSkipped: false },
-        { label: 'L1 — MRR (récurrent)', data: [0, 0, 0, 1500, 2850, 4200], backgroundColor: '#0D9488', borderRadius: 6, borderSkipped: false },
-        { label: 'L2 — Gros projet', data: [0, 0, 0, 0, 0, 80000], backgroundColor: '#10B981', borderRadius: 6, borderSkipped: false },
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          position: 'top',
-          labels: { usePointStyle: true, pointStyle: 'rectRounded', padding: 24, font: { family: 'Inter', size: 12, weight: 500 } }
-        },
-        tooltip: {
-          backgroundColor: '#1A1A2E',
-          titleFont: { family: 'Inter', size: 13, weight: 600 },
-          bodyFont: { family: 'Inter', size: 12 },
-          padding: 12,
-          cornerRadius: 8,
-          callbacks: {
-            label: (c) => ` ${c.dataset.label}: ${c.parsed.y.toLocaleString('fr-FR')}€`,
-            footer: (items) => {
-              const total = items.reduce((s, i) => s + i.parsed.y, 0);
-              return total > 0 ? `\nTotal: ${total.toLocaleString('fr-FR')}€` : '';
-            }
-          }
-        }
-      },
-      scales: {
-        x: {
-          stacked: true,
-          grid: { display: false },
-          ticks: { font: { family: 'Inter', size: 11 }, maxRotation: 0 }
-        },
-        y: {
-          stacked: true,
-          grid: { color: '#f3f4f6', drawBorder: false },
-          ticks: {
-            font: { family: 'Inter', size: 11 },
-            callback: v => v >= 1000 ? (v/1000)+'K€' : v+'€'
-          }
-        }
-      }
-    }
-  });
-});
-</script>
+<div class="foot"><div class="wrap">
+  <div class="lock lk"><img src="https://kwantic.fr/logos/logo-kwantic-white.svg" alt="Kwantic" style="height:18px"><span class="x">×</span><span class="eg" style="font-size:16px;color:#fff">egery</span></div>
+  Document préparé par Aurélien Queroy — Groupe Egery · Juin 2026 · Confidentiel<br>
+  RAISE-UP BUSINESS / Kwantic · SIREN 838 234 441
+</div></div>
 
 </body>
 </html>
